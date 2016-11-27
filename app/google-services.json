@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "250781034978",
+    "project_id": "firebase-journalapp"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:250781034978:android:ec79abcbdb0094c0",
+        "android_client_info": {
+          "package_name": "com.dhiviyad.journalapp"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "250781034978-fp4u207ufialph21c7nubfcov1n517jn.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.dhiviyad.journalapp",
+            "certificate_hash": "27B5570739A3E2F56A1581486A9A7212058C4BBF"
+          }
+        },
+        {
+          "client_id": "250781034978-rcji4mur3c8bp7j67g8utpsje1lui0vg.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDJoQIfcQ320ENuupTyZQXWWFXak3WBKvI"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 1,
+          "other_platform_oauth_client": []
+        },
+        "ads_service": {
+          "status": 1
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
