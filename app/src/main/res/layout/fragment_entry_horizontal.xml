@@ -1,13 +1,151 @@
-<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+<HorizontalScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="layout.EntryHorizontalFragment">
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    tools:context="layout.EntryHorizontalFragment"
+    android:layout_margin="0dp"
+    android:padding="0dp">
 
-    <!-- TODO: Update blank fragment layout -->
-    <TextView
+    <LinearLayout
+        android:orientation="horizontal"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:text="horizontal fragment" />
+        android:layout_height="wrap_content">
 
-</ScrollView>
+        <FrameLayout
+            android:layout_height="match_parent"
+            android:layout_gravity="top|center"
+            android:background="@color/lightGrey"
+            android:clickable="true"
+            android:onClick="onClickPhoto"
+            android:paddingLeft="10dp"
+            android:paddingRight="10dp"
+            android:padding="10dp"
+            android:layout_width="250dp">
+
+            <ImageView
+                app:srcCompat="@drawable/beautiful"
+                android:id="@+id/imageView"
+                android:paddingRight="0dp"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent" />
+
+            <ImageView
+                app:srcCompat="@android:drawable/ic_menu_edit"
+                android:id="@+id/imageView2"
+                android:layout_weight="1"
+                android:layout_width="30dp"
+                android:layout_height="30dp"
+                android:layout_gravity="bottom|right" />
+
+        </FrameLayout>
+
+        <LinearLayout
+            android:orientation="vertical"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="10dp"
+            android:layout_marginTop="0dp"
+            android:minHeight="390dp"
+            android:minWidth="350dp">
+
+            <LinearLayout
+                android:orientation="horizontal"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:clickable="true"
+                android:onClick="onClickPhoto">
+
+                <TextView
+                    android:text="Location:"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/textView4"
+                    android:layout_weight="0"
+                    android:layout_width="80dp" />
+
+                <TextView
+                    android:text="TextView"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/textView3"
+                    android:layout_weight="1" />
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:orientation="horizontal"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="5dp">
+
+                <TextView
+                    android:text="Weather:"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/textView2"
+                    android:layout_weight="0"
+                    android:layout_width="80dp" />
+
+                <TextView
+                    android:text="TextView"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/textView5"
+                    android:layout_weight="1" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:orientation="horizontal"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="5dp">
+
+                <TextView
+                    android:text="Date/time: "
+                    android:layout_width="80dp"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/textView10"
+                    android:layout_weight="0" />
+
+                <TextView
+                    android:text="TextView"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/textView11"
+                    android:layout_weight="0" />
+            </LinearLayout>
+
+            <EditText
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="textMultiLine"
+                android:ems="10"
+                android:id="@+id/editText"
+                android:layout_marginTop="20dp"
+                android:hint="Enter description"
+                style="@style/Widget.AppCompat.EditText"
+                android:fontFamily="casual" />
+
+            <LinearLayout
+                android:orientation="horizontal"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_marginTop="10dp">
+
+                <Button
+                    android:text="Save"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/button2"
+                    android:layout_width="150dp" />
+
+                <Button
+                    android:text="Cancel"
+                    android:layout_width="150dp"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/button" />
+            </LinearLayout>
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+</HorizontalScrollView>
