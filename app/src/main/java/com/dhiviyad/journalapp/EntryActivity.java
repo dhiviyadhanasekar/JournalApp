@@ -6,6 +6,8 @@ import android.content.pm.PackageManager;
 import android.content.res.Configuration;
 import android.location.Geocoder;
 import android.location.Location;
+import android.os.Handler;
+import android.os.Message;
 import android.provider.MediaStore;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
@@ -16,10 +18,12 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.dhiviyad.journalapp.constants.Permissions;
 import com.dhiviyad.journalapp.controllers.JournalEntryController;
+import com.dhiviyad.journalapp.controllers.LocationController;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GoogleApiAvailability;
 import com.google.android.gms.common.api.GoogleApiClient;
@@ -113,27 +117,62 @@ public class EntryActivity extends AppCompatActivity implements
         }
         mLastLocation = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
         if (mLastLocation != null) {
-            Toast.makeText(this, "lat = " + mLastLocation.getLatitude() + ", long = " + mLastLocation.getLongitude(), Toast.LENGTH_LONG).show();
-            Geocoder geocoder = new Geocoder(this, Locale.getDefault());
-            Toast.makeText(this, "hello 0", Toast.LENGTH_SHORT);
-            List<Address> addresses = null;
-            try {
-                Toast.makeText(this, "hello 1", Toast.LENGTH_SHORT);
-                addresses = geocoder.getFromLocation(mLastLocation.getLatitude(), mLastLocation.getLongitude(), 1);
-                Toast.makeText(this, "hello 222x", Toast.LENGTH_SHORT);
-                String cityName = addresses.get(0).getAddressLine(0);
-                String stateName = addresses.get(0).getAddressLine(1);
-                String countryName = addresses.get(0).getAddressLine(2);
-                Toast.makeText(this, cityName + ", " + stateName + " ," + countryName, Toast.LENGTH_LONG);
-            } catch (IOException e) {
-                e.printStackTrace();
-                Toast.makeText(this, "Exception " + e.getMessage(), Toast.LENGTH_LONG);
+            Toast.makeText(this, "lat = " + mLastLocation.getLatitude() + ", long = " + mLastLocation.getLongitude(), Toast.LENGTH_SHORT).show();
+
+            double latitude  = mLastLocation.getLatitude();
+            double longitude = mLastLocation.getLongitude();
+
+            LocationController locationAddress = new LocationController();
+            if(Geocoder.isPresent()){
+//                locationAddress.getAddressFromLocation(mLastLocation.getLatitude(), mLastLocation.getLongitude(),
+//                        getApplicationContext(), new GeocoderHandler());
+                TextView addres = (TextView) findViewById(R.id.locationTextView);
+                try {
+
+                    Geocoder geo = new Geocoder(this.getApplicationContext(), Locale.getDefault());
+                    List<Address> addresses = geo.getFromLocation(latitude, longitude, 1);
+                    if (addresses.isEmpty()) {
+                        addres.setText("Waiting for Location");
+                    }
+                    else {
+                        if (addresses.size() > 0) {
+                            addres.setText(addresses.get(0).getFeatureName() + ", " + addresses.get(0).getLocality() +", " + addresses.get(0).getAdminArea() + ", " + addresses.get(0).getCountryName());
+                            Toast.makeText(getApplicationContext(), "Address:- " + addresses.get(0).getFeatureName() + addresses.get(0).getAdminArea() + addresses.get(0).getLocality(), Toast.LENGTH_LONG).show();
+                        }
+                    }
+                }
+                catch (Exception e) {
+                    e.printStackTrace(); // getFromLocation() may sometimes fail
+                    addres.setText("Error");
+                    Toast.makeText(getApplicationContext(),"Error!!!", Toast.LENGTH_LONG).show();
+                }
             }
             //todo: get city, state, country
 
 //            mLatitudeText.setText(String.valueOf(mLastLocation.getLatitude()));
 //            mLongitudeText.setText(String.valueOf(mLastLocation.getLongitude()));
         }
+    }
+
+    private class GeocoderHandler extends Handler {
+        @Override
+        public void handleMessage(Message message) {
+            String locationAddress;
+            switch (message.what) {
+                case 1:
+                    Bundle bundle = message.getData();
+                    locationAddress = bundle.getString("address");
+                    handleGeoCoderOuput(locationAddress);
+                    break;
+                default:
+                    locationAddress = null;
+            }
+
+        }
+    }
+
+    private void handleGeoCoderOuput(String locationAddress) {
+        Toast.makeText(EntryActivity.this, "address " + locationAddress, Toast.LENGTH_LONG);
     }
 
     @Override

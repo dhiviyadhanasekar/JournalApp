@@ -69,7 +69,9 @@
             android:process=":journal_process" />
 
         <activity android:name=".EntryActivity" />
-
+        <activity
+            android:name=".MapsActivity"
+            android:label="@string/title_activity_maps"></activity>
     </application>
 
 </manifest>
