@@ -27,6 +27,7 @@ public class EntryActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        setTitle("Travel Journal");
         setContentView(R.layout.activity_entry);
 
         FragmentManager fragmentManager = getSupportFragmentManager();

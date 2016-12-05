@@ -25,5 +25,6 @@ public class StepsCountTable {
             + DatabaseFieldTypes.COMMA_SEP +
             StepsCountColumns.COLUMN_COUNT + DatabaseFieldTypes.INTEGER_TYPE + " )";
 
-    public static final String SQL_DELETE = "DROP TABLE IF EXISTS " + StepsCountColumns.TABLE_NAME;;
+    public static final String SQL_DELETE = "DROP TABLE IF EXISTS " + StepsCountColumns.TABLE_NAME;
+    public static final String SQL_SELECT = "SELECT * FROM "+StepsCountColumns.TABLE_NAME;
 }

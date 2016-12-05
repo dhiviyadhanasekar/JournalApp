@@ -28,7 +28,8 @@ public final class JournalEntriesTable {
     public static final String SQL_CREATE_ENTRY = "CREATE TABLE IF NOT EXISTS " + JournalEntryColumns.TABLE_NAME + " (" +
             JournalEntryColumns.COLUMN_ID + " INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL," +
             JournalEntryColumns.COLUMN_DESCRIPTION + DatabaseFieldTypes.TEXT_TYPE + DatabaseFieldTypes.COMMA_SEP +
-            JournalEntryColumns.COLUMN_TIMESTAMP +  DatabaseFieldTypes.DATE_TIME + "DEFAULT CURRENT_DATE" + DatabaseFieldTypes.COMMA_SEP +
+            JournalEntryColumns.COLUMN_TIMESTAMP +  DatabaseFieldTypes.DATE_TIME //+ "DEFAULT CURRENT_DATE"
+            + DatabaseFieldTypes.COMMA_SEP +
             JournalEntryColumns.COLUMN_LOCATION + DatabaseFieldTypes.TEXT_TYPE + DatabaseFieldTypes.COMMA_SEP +
             JournalEntryColumns.COLUMN_WEATHER + DatabaseFieldTypes.TEXT_TYPE + DatabaseFieldTypes.COMMA_SEP +
             JournalEntryColumns.COLUMN_IMAGE_TYPE + DatabaseFieldTypes.INTEGER_TYPE + DatabaseFieldTypes.COMMA_SEP +
