@@ -18,4 +18,12 @@ public class DateUtils {
         System.out.println(d); //2016-11-16
         return d;
     }
+
+    public static final String getCurrentTime(){
+        DateFormat dateFormat = new SimpleDateFormat(AppConstants.TIME_FORMAT);
+        Date cal = new Date();
+        String d = dateFormat.format(cal);
+        System.out.println(d); //2016-11-16
+        return d;
+    }
 }

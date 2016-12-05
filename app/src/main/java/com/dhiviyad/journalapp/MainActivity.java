@@ -21,6 +21,7 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 
+import com.dhiviyad.journalapp.constants.AppConstants;
 import com.dhiviyad.journalapp.constants.AppData;
 import com.dhiviyad.journalapp.constants.IntentFilterNames;
 import com.dhiviyad.journalapp.utils.DateUtils;
@@ -32,14 +33,19 @@ public class MainActivity extends AppCompatActivity {
     private static final String TAG = "MainActivity";
 
     RemoteConnection remoteConnection;
+    EntryRemoteConnection entryRemoteConnection;
+    IEntryAidlInterface entryRemoteService;
     IJournalAidlInterface remoteService;
+    boolean entryServiceConnected;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        entryServiceConnected =  false;
         bindService();
+        bindEntryService();
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -50,6 +56,15 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View view) {
 //                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
 //                        .setAction("Action", null).show();
+                if(entryServiceConnected == false){
+                    Toast.makeText(getApplicationContext(), "Waiting for services to come up", Toast.LENGTH_LONG);
+                }
+                while(entryServiceConnected == false){};
+                try {
+                    entryRemoteService.initNewEntry();
+                } catch (RemoteException e) {
+                    e.printStackTrace();
+                }
                 startActivity(new Intent(MainActivity.this, EntryActivity.class));
             }
         });
@@ -128,8 +143,36 @@ public class MainActivity extends AppCompatActivity {
     private void bindService() {
         remoteConnection = new RemoteConnection();
         Intent intent = new Intent();
-        intent.setClassName("com.dhiviyad.journalapp", JournalRemoteService.class.getName());
+        intent.setClassName(AppConstants.PACKAGE_NAME, JournalRemoteService.class.getName());
         if(!getApplicationContext().bindService(intent, remoteConnection, BIND_AUTO_CREATE)){
+            Toast.makeText(this, "failed to bind remote service", Toast.LENGTH_LONG).show();
+//            isBound = false;
+        } else {
+//            isBound = true;
+        }
+    }
+    class EntryRemoteConnection implements ServiceConnection {
+
+        @Override
+        public void onServiceConnected(ComponentName name, IBinder service) {
+            entryRemoteService = IEntryAidlInterface.Stub.asInterface((IBinder) service);
+            Log.v(TAG, "remote service connected");
+            Toast.makeText(MainActivity.this, "entry remote service connected", Toast.LENGTH_LONG).show();
+            entryServiceConnected = true;
+        }
+
+        @Override
+        public void onServiceDisconnected(ComponentName componentName) {
+            entryRemoteService = null;
+            Toast.makeText(MainActivity.this, "entry remote service disconnected", Toast.LENGTH_LONG).show();
+            Log.v(TAG, "entry remote service disconnected");
+        }
+    }
+    private void bindEntryService() {
+        entryRemoteConnection = new EntryRemoteConnection();
+        Intent intent = new Intent();
+        intent.setClassName(AppConstants.PACKAGE_NAME, EntryService.class.getName());
+        if(!getApplicationContext().bindService(intent, entryRemoteConnection, BIND_AUTO_CREATE)){
             Toast.makeText(this, "failed to bind remote service", Toast.LENGTH_LONG).show();
 //            isBound = false;
         } else {

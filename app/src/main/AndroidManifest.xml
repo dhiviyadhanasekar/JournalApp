@@ -69,9 +69,12 @@
             android:process=":journal_process" />
 
         <activity android:name=".EntryActivity" />
-        <activity
-            android:name=".MapsActivity"
-            android:label="@string/title_activity_maps"></activity>
+
+        <service
+            android:name=".EntryService"
+            android:enabled="true"
+            android:exported="true"
+            android:process=":entry_process"></service>
     </application>
 
 </manifest>

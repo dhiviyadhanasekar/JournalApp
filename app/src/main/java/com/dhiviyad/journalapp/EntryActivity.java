@@ -1,5 +1,10 @@
 package com.dhiviyad.journalapp;
 
+import android.content.BroadcastReceiver;
+import android.content.ComponentName;
+import android.content.Context;
+import android.content.IntentFilter;
+import android.content.ServiceConnection;
 import android.location.Address;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -7,7 +12,9 @@ import android.content.res.Configuration;
 import android.location.Geocoder;
 import android.location.Location;
 import android.os.Handler;
+import android.os.IBinder;
 import android.os.Message;
+import android.os.RemoteException;
 import android.provider.MediaStore;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
@@ -21,31 +28,31 @@ import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.dhiviyad.journalapp.constants.AppConstants;
+import com.dhiviyad.journalapp.constants.AppData;
+import com.dhiviyad.journalapp.constants.IntentFilterNames;
 import com.dhiviyad.journalapp.constants.Permissions;
 import com.dhiviyad.journalapp.controllers.JournalEntryController;
-import com.dhiviyad.journalapp.controllers.LocationController;
+import com.dhiviyad.journalapp.models.JournalEntryData;
+import com.dhiviyad.journalapp.utils.DateUtils;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GoogleApiAvailability;
 import com.google.android.gms.common.api.GoogleApiClient;
-import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
 
-import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
 import layout.EntryHorizontalFragment;
 import layout.EntryVerticalFragment;
 
-public class EntryActivity extends AppCompatActivity implements
-        GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener {
+public class EntryActivity extends AppCompatActivity {
 
+    private static final String TAG = "EntryActivity";
     private static final int imageID = 1;
 
-    GoogleApiClient mGoogleApiClient;
-    Location mLastLocation;
-
-    JournalEntryController journalEntryController = new JournalEntryController();
+    private JournalEntryData journalEntry;// = new JournalEntryData();
     Fragment horizontalFragment = new EntryHorizontalFragment();
     Fragment verticalFragment = new EntryVerticalFragment();
 
@@ -55,10 +62,17 @@ public class EntryActivity extends AppCompatActivity implements
         setTitle("Travel Journal");
         setContentView(R.layout.activity_entry);
 
+        bindService();
+
         if (!isGooglePlayServicesAvailable()) {
             Toast.makeText(this, "Google play services is not available - unable to fetch location", Toast.LENGTH_LONG).show();
 //            return;
-        } else initLocationService();
+        } //else initLocationService();
+        if (ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(this,
+                    new String[]{android.Manifest.permission.ACCESS_FINE_LOCATION, android.Manifest.permission.ACCESS_COARSE_LOCATION},
+                    Permissions.LOCATION_SERVICE);
+        }
 
         FragmentManager fragmentManager = getSupportFragmentManager();
         FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
@@ -74,117 +88,25 @@ public class EntryActivity extends AppCompatActivity implements
 
         fragmentTransaction.replace(R.id.fragment_placeholder, contentFragment);
         fragmentTransaction.commit();
-    }
 
-    private void initLocationService() {
-        GoogleApiAvailability googleAPI = GoogleApiAvailability.getInstance();
-        int status = googleAPI.isGooglePlayServicesAvailable(this);
-        if(ConnectionResult.SUCCESS != status) {
-            Log.e("EntryActivity", "GooglePlayServicesAvailable=false. ");
-            return;
-        }
-        mGoogleApiClient = new GoogleApiClient.Builder(this)
-                .addApi(LocationServices.API)
-                .addConnectionCallbacks(this)
-                .addOnConnectionFailedListener(this)
-                .build();
+        registerBroadCastReceivers();
     }
 
     @Override
-    protected void onStart() {
-        if(mGoogleApiClient != null) mGoogleApiClient.connect();
-        super.onStart();
-    }
-
-    @Override
-    protected void onStop() {
-        if(mGoogleApiClient != null) mGoogleApiClient.disconnect();
-        super.onStop();
-    }
-
-    @Override
-    public void onConnected(Bundle connectionHint) { getLastKnownLocation(); }
-
-    @Override
-    public void onConnectionSuspended(int i) { }
-
-    private void getLastKnownLocation() {
-        if (ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            ActivityCompat.requestPermissions(this,
-                    new String[]{android.Manifest.permission.ACCESS_FINE_LOCATION, android.Manifest.permission.ACCESS_COARSE_LOCATION},
-                    Permissions.LOCATION_SERVICE);
-            return;
-        }
-        mLastLocation = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
-        if (mLastLocation != null) {
-            Toast.makeText(this, "lat = " + mLastLocation.getLatitude() + ", long = " + mLastLocation.getLongitude(), Toast.LENGTH_SHORT).show();
-
-            double latitude  = mLastLocation.getLatitude();
-            double longitude = mLastLocation.getLongitude();
-
-            LocationController locationAddress = new LocationController();
-            if(Geocoder.isPresent()){
-//                locationAddress.getAddressFromLocation(mLastLocation.getLatitude(), mLastLocation.getLongitude(),
-//                        getApplicationContext(), new GeocoderHandler());
-                TextView addres = (TextView) findViewById(R.id.locationTextView);
-                try {
-
-                    Geocoder geo = new Geocoder(this.getApplicationContext(), Locale.getDefault());
-                    List<Address> addresses = geo.getFromLocation(latitude, longitude, 1);
-                    if (addresses.isEmpty()) {
-                        addres.setText("Waiting for Location");
-                    }
-                    else {
-                        if (addresses.size() > 0) {
-                            addres.setText(addresses.get(0).getFeatureName() + ", " + addresses.get(0).getLocality() +", " + addresses.get(0).getAdminArea() + ", " + addresses.get(0).getCountryName());
-                            Toast.makeText(getApplicationContext(), "Address:- " + addresses.get(0).getFeatureName() + addresses.get(0).getAdminArea() + addresses.get(0).getLocality(), Toast.LENGTH_LONG).show();
-                        }
-                    }
-                }
-                catch (Exception e) {
-                    e.printStackTrace(); // getFromLocation() may sometimes fail
-                    addres.setText("Error");
-                    Toast.makeText(getApplicationContext(),"Error!!!", Toast.LENGTH_LONG).show();
-                }
-            }
-            //todo: get city, state, country
-
-//            mLatitudeText.setText(String.valueOf(mLastLocation.getLatitude()));
-//            mLongitudeText.setText(String.valueOf(mLastLocation.getLongitude()));
-        }
-    }
-
-    private class GeocoderHandler extends Handler {
-        @Override
-        public void handleMessage(Message message) {
-            String locationAddress;
-            switch (message.what) {
-                case 1:
-                    Bundle bundle = message.getData();
-                    locationAddress = bundle.getString("address");
-                    handleGeoCoderOuput(locationAddress);
-                    break;
-                default:
-                    locationAddress = null;
-            }
-
-        }
-    }
-
-    private void handleGeoCoderOuput(String locationAddress) {
-        Toast.makeText(EntryActivity.this, "address " + locationAddress, Toast.LENGTH_LONG);
+    protected void onDestroy() {
+        super.onDestroy();
+        unregisterBroadcastReceivers();
     }
 
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        Log.v("onRequestPermiss", permissions.toString());
+        Log.v("onRequestPermisst", permissions.toString());
         switch (requestCode) {
 
             case Permissions.LOCATION_SERVICE:
                 if ((grantResults.length > 0) && (grantResults[0] == PackageManager.PERMISSION_GRANTED)) {
-//                    loadImage();
-                    getLastKnownLocation();
+//                    getLastKnownLocation();
                 }
                 break;
 
@@ -229,8 +151,105 @@ public class EntryActivity extends AppCompatActivity implements
         }
     }
 
-    @Override
-    public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
-
+    private void showEntry(JournalEntryData entry) {
+        if(entry == null) return;
+        TextView txtView;
+        Toast.makeText(EntryActivity.this, "city = " + entry.getCityName(), Toast.LENGTH_LONG).show();
+        if(entry.getCityName() != null){
+            txtView = (TextView) findViewById(R.id.locationTextView);
+            txtView.setText(entry.getCityName());
+        }
     }
+
+
+    /*******************************************
+     * REMOTE CONNECTION
+     * *******************************************/
+    RemoteConnection remoteConnection;
+    IEntryAidlInterface remoteService;
+    class RemoteConnection implements ServiceConnection {
+
+        @Override
+        public void onServiceConnected(ComponentName name, IBinder service) {
+            remoteService = IEntryAidlInterface.Stub.asInterface((IBinder) service);
+            Log.v(TAG, "remote service connected");
+            Toast.makeText(EntryActivity.this, "remote service connected", Toast.LENGTH_LONG).show();
+            try {
+                remoteService.sendEntryData();
+            } catch (RemoteException e) {
+                e.printStackTrace();
+            }
+        }
+
+        @Override
+        public void onServiceDisconnected(ComponentName componentName) {
+            remoteService = null;
+            Toast.makeText(EntryActivity.this, "remote service disconnected", Toast.LENGTH_LONG).show();
+            Log.v(TAG, "remote service disconnected");
+        }
+    }
+    private void bindService() {
+        remoteConnection = new RemoteConnection();
+        Intent intent = new Intent();
+        intent.setClassName(AppConstants.PACKAGE_NAME, EntryService.class.getName());
+        if(!getApplicationContext().bindService(intent, remoteConnection, BIND_AUTO_CREATE)){
+            Toast.makeText(this, "failed to bind remote service", Toast.LENGTH_LONG).show();
+//            isBound = false;
+        } else {
+//            isBound = true;
+        }
+    }
+    /*******************************************
+     * END OF REMOTE CONNECTION
+     *******************************************/
+
+    /******************************************************
+     * Broadcast service code
+     ******************************************************/
+    ArrayList<MyBroadcastReceiver> broadcastReceivers;
+    class MyBroadcastReceiver extends BroadcastReceiver {
+        public MyBroadcastReceiver() {}
+
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            String action = intent.getAction();
+
+            switch(action){
+                case IntentFilterNames.ENTRY_DATA_RECEIVED:
+//                    Toast.makeText(EntryActivity.this, "entry data received" , Toast.LENGTH_SHORT).show();
+                    JournalEntryData entry = (JournalEntryData) intent.getSerializableExtra(IntentFilterNames.ENTRY_DATA);
+                    showEntry(entry);
+                    break;
+//                case IntentFilterNames.STEPS_COUNT_RECEIVED:
+//                    long stepsCountData = (long) intent.getLongExtra(IntentFilterNames.STEPS_COUNT_DATA, 0L);
+//                    setStepCount(stepsCountData);
+//                    Toast.makeText(MainActivity.this, "Firing onsensorchanged => " + stepsCountData , Toast.LENGTH_SHORT).show();
+//                    break;
+
+
+                default: break;
+            }
+        }
+    }
+
+    private void registerBroadCastReceivers(){
+        broadcastReceivers = new ArrayList<MyBroadcastReceiver>();
+        createBroadcaseReceiver(IntentFilterNames.ENTRY_DATA_RECEIVED);
+    }
+    private void createBroadcaseReceiver(String intentName){
+        MyBroadcastReceiver r = new MyBroadcastReceiver();
+        getApplicationContext().registerReceiver(r, new IntentFilter(intentName));
+        broadcastReceivers.add(r);
+    }
+    private void unregisterBroadcastReceivers() {
+        if(broadcastReceivers != null) {
+            for (MyBroadcastReceiver br : broadcastReceivers) {
+                getApplicationContext().unregisterReceiver(br);
+            }
+            broadcastReceivers = null;
+        }
+    }
+    /******************************************************
+     * End of Broadcast service code
+     ******************************************************/
 }

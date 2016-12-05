@@ -6,9 +6,10 @@ package com.dhiviyad.journalapp.constants;
 
 public class IntentFilterNames {
 
-    public static final String PACKAGE_NAME = "com.dhiviyad.journalapp";
-
-    public static final String STEPS_COUNT_RECEIVED = PACKAGE_NAME + ".STEPS_COUNT_RECEIVED";
+    public static final String STEPS_COUNT_RECEIVED = AppConstants.PACKAGE_NAME + ".STEPS_COUNT_RECEIVED";
     public static final String STEPS_COUNT_DATA = "STEPS_COUNT_DATA";
+
+    public static final String ENTRY_DATA_RECEIVED = AppConstants.PACKAGE_NAME + ".ENTRY_DATA_RECEIVED";
+    public static final String ENTRY_DATA = "ENTRY_DATA";
 
 }
