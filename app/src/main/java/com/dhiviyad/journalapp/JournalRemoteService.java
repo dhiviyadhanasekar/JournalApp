@@ -10,7 +10,6 @@ import android.hardware.SensorManager;
 import android.os.IBinder;
 import android.os.RemoteException;
 import android.util.Log;
-import android.widget.Toast;
 
 import com.dhiviyad.journalapp.IJournalAidlInterface;
 import com.dhiviyad.journalapp.constants.IntentFilterNames;

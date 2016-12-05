@@ -159,6 +159,8 @@ public class EntryActivity extends AppCompatActivity {
             txtView = (TextView) findViewById(R.id.locationTextView);
             txtView.setText(entry.getCityName());
         }
+        txtView = (TextView) findViewById(R.id.dateTimeTextView);
+        txtView.setText(entry.getDate() + " " + entry.getTime());
     }
 
 
