@@ -6,7 +6,9 @@ package com.dhiviyad.journalapp.models;
 
 public class JournalEntryData {
     private String id;
-    private String location;
+    private String countryName;
+    private String stateName;
+    private String cityName;
     private String weather;
     private String picture;
     private String timestamp;
