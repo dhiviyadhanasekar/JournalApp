@@ -92,7 +92,7 @@
                     android:text="TextView"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:id="@+id/textView5"
+                    android:id="@+id/weatherTextView"
                     android:layout_weight="1" />
             </LinearLayout>
 
@@ -131,7 +131,7 @@
                 android:layout_height="wrap_content"
                 android:inputType="textMultiLine"
                 android:ems="10"
-                android:id="@+id/editText"
+                android:id="@+id/descEditText"
                 android:layout_marginTop="20dp"
                 android:hint="Enter description"
                 style="@style/Widget.AppCompat.EditText"
@@ -150,13 +150,9 @@
                 android:text="Save"
                 android:layout_height="wrap_content"
                 android:id="@+id/button2"
-                android:layout_width="150dp" />
-
-            <Button
-                android:text="Cancel"
                 android:layout_width="150dp"
-                android:layout_height="wrap_content"
-                android:id="@+id/button" />
+                android:onClick="saveEntry" />
+
         </LinearLayout>
 
     </LinearLayout>

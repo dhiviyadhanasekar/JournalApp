@@ -38,4 +38,23 @@ public class JournalEntryController {
     public JournalEntryData getEntry() {
         return journalEntry;
     }
+
+    public void updateWeather(String temp) {
+        journalEntry.setWeather(temp);
+    }
+
+    public JournalEntryData saveEntryToDB() {
+//        journalEntry.setDescription(description);
+        if(journalEntry.getId() == null){
+            long id = db.insertEntry(journalEntry);
+            journalEntry.setId( id );
+        } else {
+            db.updateEntry(journalEntry);
+        }
+        return journalEntry;
+    }
+
+    public void saveDescription(String text) {
+        journalEntry.setDescription(text);
+    }
 }

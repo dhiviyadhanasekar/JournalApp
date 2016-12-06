@@ -21,10 +21,21 @@ public class JournalEntryData implements Serializable{
     private String time;
     private String date;
     private String description;
+    private long timestamp;
 
     public JournalEntryData() {
         time = DateUtils.getCurrentTime();
         date = DateUtils.getCurrentDate();
+        timestamp = System.currentTimeMillis();
+        description = "";
+    }
+
+    public void setTimestamp(long timestamp) {
+        this.timestamp = timestamp;
+    }
+
+    public long getTimestamp() {
+        return timestamp;
     }
 
     public void setLatitude(Double latitude) {

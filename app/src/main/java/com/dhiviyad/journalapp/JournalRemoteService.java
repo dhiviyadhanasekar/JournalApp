@@ -37,11 +37,12 @@ public class JournalRemoteService extends Service implements SensorEventListener
 
     @Override
     public void onDestroy() {
-        super.onDestroy();
         //todo: save steps count to db
         Log.v(TAG, "Remote service onDestroy called");
-        stepsCountController.saveStepCountToDB();
+        StepsCountData d = stepsCountController.saveStepCountToDB();
+        Log.v(TAG, "stepsCount saved = " +  d.getStepsCount() + " => id" + d.getId());
         sensorManager.unregisterListener(this);
+        super.onDestroy();
     }
 
     @Override

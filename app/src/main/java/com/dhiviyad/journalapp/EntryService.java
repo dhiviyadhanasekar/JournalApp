@@ -7,23 +7,29 @@ import android.location.Address;
 import android.location.Geocoder;
 import android.location.Location;
 import android.os.Bundle;
+import android.os.Handler;
 import android.os.IBinder;
 import android.os.RemoteException;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.util.Log;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.dhiviyad.journalapp.constants.IntentFilterNames;
 import com.dhiviyad.journalapp.constants.Permissions;
 import com.dhiviyad.journalapp.controllers.JournalEntryController;
 import com.dhiviyad.journalapp.controllers.StepsCountController;
+import com.dhiviyad.journalapp.webservice.RemoteFetch;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GoogleApiAvailability;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
+
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.util.List;
 import java.util.Locale;
@@ -35,6 +41,7 @@ public class EntryService extends Service implements GoogleApiClient.ConnectionC
 
     GoogleApiClient mGoogleApiClient;
     Location mLastLocation = null;
+    Handler handler = null;
 
     boolean recordingEntry;
     JournalEntryController journalEntryController;
@@ -49,6 +56,7 @@ public class EntryService extends Service implements GoogleApiClient.ConnectionC
         initAIDLBinder();
         createController();
         initGooglePlayService();
+        if(handler == null) handler = new Handler();
         recordingEntry = false;
     }
 
@@ -76,9 +84,22 @@ public class EntryService extends Service implements GoogleApiClient.ConnectionC
             public void sendEntryData(){
                 sendEntryDataBroadcast();
             }
+            @Override
+            public void saveEntryData(){  saveEntryToDB();}
+            @Override
+            public void saveDescription(String text){
+                onSaveDescription(text);
+            };
         };
     }
 
+    private void onSaveDescription(String text) {
+        journalEntryController.saveDescription(text);
+    }
+
+    private void saveEntryToDB() {
+        journalEntryController.saveEntryToDB();
+    }
 
 
     @Override
@@ -105,6 +126,39 @@ public class EntryService extends Service implements GoogleApiClient.ConnectionC
         sendBroadcast(i);
     }
 
+    private void updateWeatherData(final double latitude, final double longitude){
+
+        new Thread(){
+            public void run(){
+                final JSONObject json = RemoteFetch.getJSON(getApplicationContext(), (double) latitude, (double) longitude);
+                if(json == null){
+                    handler.post(new Runnable(){
+                        public void run(){
+                            Log.v(TAG, " no results from weather api " );
+                        }
+                    });
+                } else {
+                    handler.post(new Runnable(){
+                        public void run(){
+                            Log.v(TAG, " yayy api works " );
+                            renderWeather(json);
+                        }
+                    });
+                }
+            }
+        }.start();
+    }
+
+    private void renderWeather(JSONObject main) {
+        try {
+            //main.getDouble("temp")+ "\u00B0" + "F"
+            if(journalEntryController != null) journalEntryController.updateWeather(main.getDouble("temp")+ "\u00B0" + "F");
+            sendEntryDataBroadcast();
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+    }
+
     private void getLastKnownLocation() {
         if (ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             return;
@@ -117,38 +171,44 @@ public class EntryService extends Service implements GoogleApiClient.ConnectionC
             double longitude = mLastLocation.getLongitude();
             journalEntryController.updateLocCoordinates(latitude, longitude);
 
-            if(Geocoder.isPresent()){
-                try {
+            Log.v(TAG, "lat = " +  latitude + ", long = " + longitude);
 
-                    Geocoder geo = new Geocoder(getApplicationContext(), Locale.getDefault());
-                    List<Address> addresses = geo.getFromLocation(latitude, longitude, 1);
-                    if (addresses.isEmpty()) {
-                        Log.v(TAG, "No locations available 1");
+            getLocationName(latitude, longitude);
+            updateWeatherData(latitude, longitude);
+        }
+    }
+
+    private void getLocationName(double latitude, double longitude) {
+        if(Geocoder.isPresent()){
+            try {
+
+                Geocoder geo = new Geocoder(getApplicationContext(), Locale.getDefault());
+                List<Address> addresses = geo.getFromLocation(latitude, longitude, 1);
+                if (addresses.isEmpty()) {
+                    Log.v(TAG, "No locations available 1");
 //                        addres.setText("No locations available");
 //                        Toast.makeText(this, "No locations available", Toast.LENGTH_LONG).show();
-                    }
-                    else {
-                        if (addresses.size() > 0) {
-                            String cityName = addresses.get(0).getLocality();
-                            String stateName = addresses.get(0).getAdminArea();
-                            String countryName = addresses.get(0).getCountryName();
-                            journalEntryController.updateAddress(cityName, stateName, countryName);
+                }
+                else {
+                    if (addresses.size() > 0) {
+                        String cityName = addresses.get(0).getLocality();
+                        String stateName = addresses.get(0).getAdminArea();
+                        String countryName = addresses.get(0).getCountryName();
+                        journalEntryController.updateAddress(cityName, stateName, countryName);
 //                            addres.setText(addresses.get(0).getFeatureName() + ", " + addresses.get(0).getLocality() +", " + addresses.get(0).getAdminArea() + ", " + addresses.get(0).getCountryName());
 //                            Toast.makeText(this, cityName + ", " + stateName + ", " + countryName, Toast.LENGTH_LONG).show();
-                            Log.v(TAG, "Address = " + cityName + ", " + stateName + ", " + countryName);
-                        } else {
-                            Log.v(TAG, "No locations available 2");
+                        Log.v(TAG, "Address = " + cityName + ", " + stateName + ", " + countryName);
+                    } else {
+                        Log.v(TAG, "No locations available 2");
 //                            Toast.makeText(this, "No locations available 2", Toast.LENGTH_LONG).show();
-                        }
                     }
                 }
-                catch (Exception e) {
-                    e.printStackTrace(); // getFromLocation() may sometimes fail
+            }
+            catch (Exception e) {
+                e.printStackTrace(); // getFromLocation() may sometimes fail
 //                    addres.setText("Error");
 //                    Toast.makeText(getApplicationContext(),"Error!!!", Toast.LENGTH_LONG).show();
-                }
             }
-            //todo: get city, state, country
         }
     }
 

@@ -23,8 +23,11 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.view.View;
+import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -35,14 +38,10 @@ import com.dhiviyad.journalapp.constants.Permissions;
 import com.dhiviyad.journalapp.controllers.JournalEntryController;
 import com.dhiviyad.journalapp.models.JournalEntryData;
 import com.dhiviyad.journalapp.utils.DateUtils;
+import com.dhiviyad.journalapp.webservice.RemoteFetch;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GoogleApiAvailability;
-import com.google.android.gms.common.api.GoogleApiClient;
-import com.google.android.gms.location.LocationServices;
-
 import java.util.ArrayList;
-import java.util.List;
-import java.util.Locale;
 
 import layout.EntryHorizontalFragment;
 import layout.EntryVerticalFragment;
@@ -88,8 +87,32 @@ public class EntryActivity extends AppCompatActivity {
 
         fragmentTransaction.replace(R.id.fragment_placeholder, contentFragment);
         fragmentTransaction.commit();
-
         registerBroadCastReceivers();
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        TextView description = (TextView) findViewById(R.id.descEditText);
+        description.addTextChangedListener(new TextWatcher()
+        {
+            @Override
+            public void afterTextChanged(Editable mEdit)
+            {
+                String text = mEdit.toString();
+                if(remoteService != null){
+                    try {
+                        remoteService.saveDescription(text);
+                    } catch (RemoteException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+
+            public void beforeTextChanged(CharSequence s, int start, int count, int after){}
+
+            public void onTextChanged(CharSequence s, int start, int before, int count){}
+        });
     }
 
     @Override
@@ -154,13 +177,35 @@ public class EntryActivity extends AppCompatActivity {
     private void showEntry(JournalEntryData entry) {
         if(entry == null) return;
         TextView txtView;
-        Toast.makeText(EntryActivity.this, "city = " + entry.getCityName(), Toast.LENGTH_LONG).show();
+//        Toast.makeText(EntryActivity.this, "city = " + entry.getCityName(), Toast.LENGTH_LONG).show();
+        txtView = (TextView) findViewById(R.id.locationTextView);
         if(entry.getCityName() != null){
-            txtView = (TextView) findViewById(R.id.locationTextView);
             txtView.setText(entry.getCityName());
-        }
+        } else txtView.setText("Data not yet available");
         txtView = (TextView) findViewById(R.id.dateTimeTextView);
         txtView.setText(entry.getDate() + " " + entry.getTime());
+        String weather = "Waiting to get data";
+        if(entry.getWeather() != null){
+            weather = entry.getWeather();
+        }
+        txtView = (TextView) findViewById(R.id.weatherTextView);
+        txtView.setText(weather);
+
+        EditText descEditText = (EditText) findViewById(R.id.descEditText);
+        descEditText.setText(entry.getDescription());
+    }
+
+    public void saveEntry(View v){
+//        Toast.makeText(this, "Start Save", Toast.LENGTH_LONG).show();
+        if(remoteService != null){
+            try {
+                remoteService.saveEntryData();
+                Toast.makeText(EntryActivity.this, "Saved", Toast.LENGTH_LONG).show();
+            } catch (RemoteException e) {
+                e.printStackTrace();
+                Toast.makeText(EntryActivity.this, "Error - not saved", Toast.LENGTH_LONG).show();
+            }
+        }
     }
 
 
@@ -175,7 +220,7 @@ public class EntryActivity extends AppCompatActivity {
         public void onServiceConnected(ComponentName name, IBinder service) {
             remoteService = IEntryAidlInterface.Stub.asInterface((IBinder) service);
             Log.v(TAG, "remote service connected");
-            Toast.makeText(EntryActivity.this, "remote service connected", Toast.LENGTH_LONG).show();
+//            Toast.makeText(EntryActivity.this, "remote service connected", Toast.LENGTH_LONG).show();
             try {
                 remoteService.sendEntryData();
             } catch (RemoteException e) {
@@ -186,7 +231,7 @@ public class EntryActivity extends AppCompatActivity {
         @Override
         public void onServiceDisconnected(ComponentName componentName) {
             remoteService = null;
-            Toast.makeText(EntryActivity.this, "remote service disconnected", Toast.LENGTH_LONG).show();
+//            Toast.makeText(EntryActivity.this, "remote service disconnected", Toast.LENGTH_LONG).show();
             Log.v(TAG, "remote service disconnected");
         }
     }

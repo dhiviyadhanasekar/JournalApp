@@ -8,6 +8,7 @@ import android.database.sqlite.SQLiteOpenHelper;
 import android.support.annotation.NonNull;
 import android.util.Log;
 
+import com.dhiviyad.journalapp.models.JournalEntryData;
 import com.dhiviyad.journalapp.models.StepsCountData;
 import com.dhiviyad.journalapp.utils.DateUtils;
 
@@ -18,7 +19,7 @@ import com.dhiviyad.journalapp.utils.DateUtils;
 public class DatabaseHelper extends SQLiteOpenHelper {
 
     private static final String DATABASE_NAME = "JournalAppDB";
-    public static final int DATABASE_VERSION = 3;
+    public static final int DATABASE_VERSION = 2;
 
     public DatabaseHelper(Context context){
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
@@ -96,5 +97,46 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 selectionArgs);
 
         Log.i("User table updated", "count =" + count);
+    }
+
+
+    public int updateEntry(JournalEntryData journalEntry) {
+        SQLiteDatabase db = this.getReadableDatabase();
+        ContentValues values = getEntryContentValues(journalEntry);
+
+        // Which row to update, based on the title
+        String selection = JournalEntriesTable.JournalEntryColumns.COLUMN_ID + " = ?";
+        String[] selectionArgs = { journalEntry.getId()+"" };
+
+        int count = db.update(
+                JournalEntriesTable.JournalEntryColumns.TABLE_NAME,
+                values,
+                selection,
+                selectionArgs);
+
+        Log.i("User table updated", "count =" + count);
+        return count;
+    }
+
+    public long insertEntry(JournalEntryData journalEntry) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues values = getEntryContentValues(journalEntry);
+        return db.insert(JournalEntriesTable.JournalEntryColumns.TABLE_NAME, null, values);
+    }
+
+    private ContentValues getEntryContentValues(JournalEntryData u) {
+        ContentValues values = new ContentValues();
+        if(u.getLatitude() != null) values.put(JournalEntriesTable.JournalEntryColumns.COLUMN_LATITUDE, u.getLatitude());
+        if(u.getLongitude() != null) values.put(JournalEntriesTable.JournalEntryColumns.COLUMN_LONGITUDE, u.getLongitude());
+        if(u.getCountryName() != null) values.put(JournalEntriesTable.JournalEntryColumns.COLUMN_COUNTRY_NAME, u.getCountryName());
+        if(u.getStateName() != null) values.put(JournalEntriesTable.JournalEntryColumns.COLUMN_STATE_NAME, u.getStateName());
+        if(u.getCityName() != null) values.put(JournalEntriesTable.JournalEntryColumns.COLUMN_CITY_NAME, u.getCityName());
+        if(u.getWeather() != null) values.put(JournalEntriesTable.JournalEntryColumns.COLUMN_WEATHER, u.getWeather());
+        if(u.getPicture() != null) values.put(JournalEntriesTable.JournalEntryColumns.COLUMN_PICTURE, u.getPicture());
+        if(u.getTime() != null) values.put(JournalEntriesTable.JournalEntryColumns.COLUMN_TIME, u.getTime());
+        if(u.getDate() != null) values.put(JournalEntriesTable.JournalEntryColumns.COLUMN_DATE, u.getDate());
+        values.put(JournalEntriesTable.JournalEntryColumns.COLUMN_TIMESTAMP, u.getTimestamp());
+        if(u.getDescription() != null )values.put(JournalEntriesTable.JournalEntryColumns.COLUMN_DESCRIPTION, u.getDescription());
+        return values;
     }
 }

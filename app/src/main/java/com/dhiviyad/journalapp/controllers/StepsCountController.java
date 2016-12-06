@@ -27,6 +27,7 @@ public class StepsCountController {
     public long processStepDetected(){
         if(DateUtils.getCurrentDate().equalsIgnoreCase(stepsCountData.getDate())) {
             stepsCountData.incrementStepCount();
+            this.saveStepCountToDB();
             return stepsCountData.getStepsCount();
         } else {
             this.saveStepCountToDB();
@@ -36,14 +37,14 @@ public class StepsCountController {
         }
     }
 
-    public void saveStepCountToDB() {
+    public StepsCountData saveStepCountToDB() {
         if(stepsCountData.getId() == null) {
             db.insertStepsCountRow(stepsCountData);
         } else {
             db.updateStepsCountRow(stepsCountData);
         }
         stepsCountData = db.createFetchStepsCount();//new StepsCountData();
-//        return stepsCountData;
+        return stepsCountData;
     }
 
     public long getStepsCount() {

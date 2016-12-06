@@ -13,4 +13,6 @@ interface IEntryAidlInterface {
 
      void initNewEntry();
      void sendEntryData();
+     void saveEntryData();
+     void saveDescription(String text);
 }
