@@ -51,5 +51,11 @@ public final class JournalEntriesTable {
             JournalEntryColumns.COLUMN_TIMESTAMP + DatabaseFieldTypes.INTEGER_TYPE
             + " )";
 
-    public static final String SQL_DELETE = "DROP TABLE IF EXISTS " + JournalEntryColumns.TABLE_NAME;;
+    public static final String SQL_DELETE = "DROP TABLE IF EXISTS " + JournalEntryColumns.TABLE_NAME;
+
+    public static final String SQL_SELECT_ALL = "SELECT * FROM " + JournalEntryColumns.TABLE_NAME ;
+    public static final String SQL_SELECT_BY_DATE(String date){
+        return SQL_SELECT_ALL + " WHERE " + JournalEntryColumns.COLUMN_DATE + " = '" + date
+                + "' ORDER BY " + JournalEntryColumns.COLUMN_TIMESTAMP;
+    }
 }

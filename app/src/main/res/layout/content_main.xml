@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/content_main"
     android:layout_width="match_parent"
@@ -42,13 +43,18 @@
             android:orientation="vertical"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:padding="10dp">
+            android:id="@+id/entriesView">
 
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="No Entries found!"
-                android:paddingTop="5dp" />
+                android:paddingTop="5dp"
+                android:layout_marginLeft="10dp"
+                android:id="@+id/entriesHeaderTextView" />
+
+            <!--<include layout="@layout/entry_item" />-->
+
 
         </LinearLayout>
 

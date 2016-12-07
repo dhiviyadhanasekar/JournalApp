@@ -12,7 +12,11 @@ import android.os.RemoteException;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.GestureDetector;
+import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -73,7 +77,29 @@ public class MainActivity extends AppCompatActivity {
             AppData.getInstance().setDateSelected(DateUtils.getCurrentDate());
         }
 
+        LinearLayout mainView = (LinearLayout) findViewById(R.id.entriesView);
+        for(int i=0; i< 3; i++) {
+            LayoutInflater inflater = (LayoutInflater) getApplicationContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+            View entryView = inflater.inflate(R.layout.entry_item, null);//(R.layout.entry_item, );
+            LinearLayout.LayoutParams buttonLayoutParams = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+            buttonLayoutParams.setMargins(0,10,0,10);
+            entryView.setLayoutParams(buttonLayoutParams);
+            final GestureDetector gestureDetector = new GestureDetector(getApplicationContext(), new MyGestureDetector(entryView));
+            entryView.setOnTouchListener(new View.OnTouchListener() {
+                public boolean onTouch(View v, MotionEvent event) {
+//                    Toast.makeText(MainActivity.this, "gesture detected ", Toast.LENGTH_SHORT).show();
+                    return gestureDetector.onTouchEvent(event);
+                }
+            });
+            mainView.addView(entryView);
+        }
+
         registerBroadCastReceivers();
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
     }
 
     @Override
@@ -112,6 +138,55 @@ public class MainActivity extends AppCompatActivity {
             }
         }
     }
+
+    /*******************************************
+     * GESTURES
+     *******************************************/
+    private final static int REL_SWIPE_MIN_DISTANCE = 0;
+    class MyGestureDetector extends GestureDetector.SimpleOnGestureListener {
+
+        View view;
+
+        public MyGestureDetector(View view){
+            this.view = view;
+        }
+
+        @Override
+        public boolean onDown(MotionEvent event) {
+            return true;
+        }
+
+
+        @Override
+        public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX, float velocityY) {
+            Log.d(TAG,"Fling detected");
+            if(e1.getX() - e2.getX() >= REL_SWIPE_MIN_DISTANCE) {
+                return onRTLFling( view);
+            }  else {
+                return onLTRFling(view);
+            }
+        }
+
+    }
+
+    private boolean onLTRFling(View view) {
+        //hide menu
+        View buttonLayout = view.findViewById(R.id.buttons);
+        if(buttonLayout.isShown()) buttonLayout.setVisibility(View.GONE);
+//        Toast.makeText(context,"hiihih Left to right " + list[pos].getName(),Toast.LENGTH_SHORT).show();
+        return true;
+    }
+
+    private boolean onRTLFling(View view) {
+        View buttonLayout = view.findViewById(R.id.buttons);
+        if(!buttonLayout.isShown()) buttonLayout.setVisibility(View.VISIBLE);
+//        Toast.makeText(context,"hiihih RTL " + list[pos].getName(),Toast.LENGTH_SHORT).show();
+        return true;
+    }
+    /*******************************************
+     * END OF GESTURES
+     * *******************************************/
+
 
 
     /*******************************************
