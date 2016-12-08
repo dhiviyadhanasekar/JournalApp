@@ -52,7 +52,11 @@
                 android:text="No Entries found!"
                 android:paddingTop="5dp"
                 android:layout_marginLeft="10dp"
-                android:id="@+id/entriesHeaderTextView" />
+                android:id="@+id/entriesHeaderTextView"
+                android:textAppearance="@style/TextAppearance.AppCompat.Large"
+                android:textColorLink="?attr/colorAccent"
+                android:textColor="@color/colorAccent"
+                android:layout_marginBottom="10dp" />
 
             <!--<include layout="@layout/entry_item" />-->
 
@@ -63,7 +67,9 @@
             android:orientation="horizontal"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:padding="10dp">
+            android:padding="10dp"
+            android:background="@color/lightGrey"
+            android:layout_margin="20dp">
 
             <TextView
                 android:text="Steps walked:"

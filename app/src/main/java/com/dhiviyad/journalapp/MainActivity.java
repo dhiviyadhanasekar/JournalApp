@@ -134,14 +134,16 @@ public class MainActivity extends AppCompatActivity {
             TextView txtView = (TextView) entryView.findViewById(R.id.timeView);
             txtView.setText(entryData.get(i).getTime());
             txtView = (TextView) entryView.findViewById(R.id.descView);
-            txtView.setText(entryData.get(i).getDescription());
+            String desc = entryData.get(i).getDescription();
+            desc = desc.substring(0, Math.min(desc.length(), 40)) + ((desc.length()>40)?"...": "");
+            txtView.setText(desc);
 
             mainView.addView(entryView);
             entryViewsArr.add(entryView);
         }
 
         String textForHeader = "Entries for " + DateUtils.getEntriesHeaderDateFromDateFormat(AppData.getInstance().getDateSelected());
-        if(entryViewsArr.size() <= 0 ) textForHeader += " : No entries found";
+        if(entryViewsArr.size() <= 0 ) textForHeader += ": No entries found";
         TextView entriesHeader = (TextView) findViewById(R.id.entriesHeaderTextView);
         entriesHeader.setText(textForHeader);
 
