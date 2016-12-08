@@ -32,4 +32,8 @@ public class MainPageController {
     public long getStepCounts(String date){
         return db.getStepsCountData(date).getStepsCount();
     }
+
+    public int deleteEntry(Long id) {
+        return db.deleteJournalEntry(id);
+    }
 }

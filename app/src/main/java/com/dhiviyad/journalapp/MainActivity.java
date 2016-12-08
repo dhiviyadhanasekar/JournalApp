@@ -16,8 +16,11 @@ import android.view.GestureDetector;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
+import android.widget.Button;
 import android.widget.CalendarView;
+import android.widget.ImageButton;
 import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -103,6 +106,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void addEntriesToView() {
+//        updateDateViews();
         LinearLayout mainView = (LinearLayout) findViewById(R.id.entriesView);
         if(entryViewsArr != null && entryViewsArr.size() > 0 ){
             for(int i=0; i< entryViewsArr.size(); i++) {
@@ -113,7 +117,7 @@ public class MainActivity extends AppCompatActivity {
         entryViewsArr = new ArrayList<View>();
 
         if(mainPageController == null) mainPageController = new MainPageController(getApplicationContext());
-        ArrayList<JournalEntryData> entryData = mainPageController.getEntries(AppData.getInstance().getDateSelected());
+        final ArrayList<JournalEntryData> entryData = mainPageController.getEntries(AppData.getInstance().getDateSelected());
 
         for(int i=0; i<entryData.size(); i++) {
 
@@ -127,17 +131,27 @@ public class MainActivity extends AppCompatActivity {
             final GestureDetector gestureDetector = new GestureDetector(getApplicationContext(), new MyGestureDetector(entryView));
             entryView.setOnTouchListener(new View.OnTouchListener() {
                 public boolean onTouch(View v, MotionEvent event) {
+//                    Toast.makeText(MainActivity.this, "Touch detetced", Toast.LENGTH_SHORT).show();
                     return gestureDetector.onTouchEvent(event);
                 }
             });
 
-            TextView txtView = (TextView) entryView.findViewById(R.id.timeView);
-            txtView.setText(entryData.get(i).getTime());
-            txtView = (TextView) entryView.findViewById(R.id.descView);
-            String desc = entryData.get(i).getDescription();
-            desc = desc.substring(0, Math.min(desc.length(), 40)) + ((desc.length()>40)?"...": "");
-            txtView.setText(desc);
+            final JournalEntryData currentEntryData = entryData.get(i);
+            ImageButton deleteButton = (ImageButton) entryView.findViewById(R.id.trashBin);
+            deleteButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+//                    Log.v(TAG, "Clicked delete button for id :: " + currentEntryData.getId());
+                    int count = mainPageController.deleteEntry(currentEntryData.getId());
+                    if(count > 0){
+                        Toast.makeText(getApplicationContext(), "Deleted " + count + " entry", Toast.LENGTH_SHORT).show();
+                        addEntriesToView();
+                    }
+//                    Toast.makeText(getApplicationContext(), "onClick", Toast.LENGTH_SHORT).show();
+                }
+            });
 
+            setEntryTextFields(entryView, currentEntryData);
             mainView.addView(entryView);
             entryViewsArr.add(entryView);
         }
@@ -151,6 +165,15 @@ public class MainActivity extends AppCompatActivity {
             setStepsCountTextView(mainPageController.getStepCounts(AppData.getInstance().getDateSelected()));
         }
 
+    }
+
+    private void setEntryTextFields(View entryView, JournalEntryData currentEntryData) {
+        TextView txtView = (TextView) entryView.findViewById(R.id.timeView);
+        txtView.setText(currentEntryData.getTime());
+        txtView = (TextView) entryView.findViewById(R.id.descView);
+        String desc = currentEntryData.getDescription();
+        desc = desc.substring(0, Math.min(desc.length(), 40)) + ((desc.length()>40)?"...": "");
+        txtView.setText(desc);
     }
 
     private void onDateChangedByUsed(int year, int month, int dayOfMonth) {
@@ -249,7 +272,9 @@ public class MainActivity extends AppCompatActivity {
 
     private boolean onRTLFling(View view) {
         View buttonLayout = view.findViewById(R.id.buttons);
-        if(!buttonLayout.isShown()) buttonLayout.setVisibility(View.VISIBLE);
+        if(!buttonLayout.isShown()) {
+            buttonLayout.setVisibility(View.VISIBLE);
+        }
 //        Toast.makeText(context,"hiihih RTL " + list[pos].getName(),Toast.LENGTH_SHORT).show();
         return true;
     }

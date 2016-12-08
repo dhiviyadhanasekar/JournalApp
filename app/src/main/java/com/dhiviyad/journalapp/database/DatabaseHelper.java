@@ -179,4 +179,13 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         return entriesArr;
     }
 
+    public int deleteJournalEntry(Long id) {
+
+        SQLiteDatabase db = this.getWritableDatabase();
+        String table = JournalEntriesTable.JournalEntryColumns.TABLE_NAME;
+        String whereClause = JournalEntriesTable.JournalEntryColumns.COLUMN_ID + " = ?";
+        String[] whereArgs = new String[] { id + "" };
+        return db.delete(table, whereClause, whereArgs);
+
+    }
 }
