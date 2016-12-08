@@ -23,12 +23,12 @@
         android:clickable="true">
 
         <ImageButton
-            app:srcCompat="@drawable/trash_bin"
+            app:srcCompat="@android:drawable/ic_menu_delete"
             android:scaleType="fitCenter"
             android:layout_width="40dp"
             android:layout_height="90dp"
             android:background="#fff"
-            android:src="@drawable/trash_bin"
+            android:src="@android:drawable/ic_menu_delete"
             android:id="@+id/trashBin" />
     </RelativeLayout>
 
@@ -40,8 +40,8 @@
 
     <LinearLayout
         android:orientation="vertical"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        android:layout_width="250dp">
 
         <TextView
             android:text="TextView"
@@ -61,5 +61,24 @@
             android:textColor="@color/common_google_signin_btn_text_light_default"
             android:layout_marginTop="2dp" />
     </LinearLayout>
+
+    <RelativeLayout
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:orientation="horizontal"
+        android:id="@+id/editButton"
+        android:layout_marginLeft="5dp"
+        android:clickable="true">
+
+        <ImageButton
+            app:srcCompat="@android:drawable/ic_menu_edit"
+            android:scaleType="fitCenter"
+            android:layout_height="90dp"
+            android:background="#fff"
+            android:src="@android:drawable/ic_menu_edit"
+            android:id="@+id/pencilBtn"
+            android:layout_alignParentRight="true"
+            android:layout_width="40dp" />
+    </RelativeLayout>
 
 </LinearLayout>

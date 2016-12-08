@@ -30,6 +30,21 @@ public class JournalEntryData implements Serializable{
         description = "";
     }
 
+    public JournalEntryData(Long id, Double latitude, Double longitude, String countryName, String stateName, String cityName, String weather, String picture, String time, String date, String description, long timestamp) {
+        this.id = id;
+        this.latitude = latitude;
+        this.longitude = longitude;
+        this.countryName = countryName;
+        this.stateName = stateName;
+        this.cityName = cityName;
+        this.weather = weather;
+        this.picture = picture;
+        this.time = time;
+        this.date = date;
+        this.description = description;
+        this.timestamp = timestamp;
+    }
+
     public void setTimestamp(long timestamp) {
         this.timestamp = timestamp;
     }

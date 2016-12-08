@@ -20,6 +20,7 @@ import com.dhiviyad.journalapp.constants.IntentFilterNames;
 import com.dhiviyad.journalapp.constants.Permissions;
 import com.dhiviyad.journalapp.controllers.JournalEntryController;
 import com.dhiviyad.journalapp.controllers.StepsCountController;
+import com.dhiviyad.journalapp.models.JournalEntryData;
 import com.dhiviyad.journalapp.webservice.RemoteFetch;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GoogleApiAvailability;
@@ -89,6 +90,16 @@ public class EntryService extends Service implements GoogleApiClient.ConnectionC
             @Override
             public void saveDescription(String text){
                 onSaveDescription(text);
+            };
+            @Override
+            public void initExistingEntry(long id, double latitude, double longitude
+                    , String countryName, String stateName, String cityName
+                    , String weather, String picture, String time, String date, String description, long timestamp){
+                JournalEntryData j = new JournalEntryData(id
+                        ,  latitude < 0 ? null : latitude
+                        , longitude < 0 ? null : longitude
+                        , countryName, stateName,  cityName,  weather,  picture,  time,  date,  description, timestamp);
+                journalEntryController.createExistingEntry(j);
             };
         };
     }

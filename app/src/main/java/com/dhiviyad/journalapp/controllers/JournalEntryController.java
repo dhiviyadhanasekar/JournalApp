@@ -20,6 +20,9 @@ public class JournalEntryController {
     }
 
 
+    public void createExistingEntry(JournalEntryData jdata){
+        journalEntry = jdata;
+    }
     public void createNewEntry() {
         journalEntry = new JournalEntryData();
     }

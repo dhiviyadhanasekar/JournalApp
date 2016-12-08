@@ -15,4 +15,7 @@ interface IEntryAidlInterface {
      void sendEntryData();
      void saveEntryData();
      void saveDescription(String text);
+     void initExistingEntry(long id, double latitude, double longitude
+     , String countryName, String stateName, String cityName
+     , String weather, String picture, String time, String date, String description, long timestamp);
 }
