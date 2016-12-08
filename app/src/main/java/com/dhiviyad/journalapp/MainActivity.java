@@ -16,6 +16,7 @@ import android.view.GestureDetector;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
+import android.widget.CalendarView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -28,6 +29,9 @@ import android.view.MenuItem;
 import com.dhiviyad.journalapp.constants.AppConstants;
 import com.dhiviyad.journalapp.constants.AppData;
 import com.dhiviyad.journalapp.constants.IntentFilterNames;
+import com.dhiviyad.journalapp.controllers.MainPageController;
+import com.dhiviyad.journalapp.models.JournalEntryData;
+import com.dhiviyad.journalapp.models.SelectedDateEntriesData;
 import com.dhiviyad.journalapp.utils.DateUtils;
 
 import java.util.ArrayList;
@@ -41,6 +45,8 @@ public class MainActivity extends AppCompatActivity {
     IEntryAidlInterface entryRemoteService;
     IJournalAidlInterface remoteService;
     boolean entryServiceConnected;
+    ArrayList<View> entryViewsArr;
+    MainPageController mainPageController;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -73,28 +79,85 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+        updateDateViews();
+        addEntriesToView();
+        registerBroadCastReceivers();
+    }
+
+    private void updateDateViews() {
         if(AppData.getInstance().getDateSelected() == null){
             AppData.getInstance().setDateSelected(DateUtils.getCurrentDate());
         }
 
+        CalendarView calendarView = (CalendarView) findViewById(R.id.calendarView);
+        calendarView.setOnDateChangeListener(new CalendarView.OnDateChangeListener() {
+
+            @Override
+            public void onSelectedDayChange(CalendarView view, int year, int month,
+                                            int dayOfMonth) {
+                onDateChangedByUsed(year, month, dayOfMonth);
+            }
+        });
+        calendarView.setDate(DateUtils.getCalendarDateFromDateFormat(AppData.getInstance().getDateSelected()), true, true);
+    }
+
+    private void addEntriesToView() {
         LinearLayout mainView = (LinearLayout) findViewById(R.id.entriesView);
-        for(int i=0; i< 3; i++) {
+        if(entryViewsArr != null && entryViewsArr.size() > 0 ){
+            for(int i=0; i< entryViewsArr.size(); i++) {
+                mainView.removeView(entryViewsArr.get(i));
+            }
+        }
+
+        entryViewsArr = new ArrayList<View>();
+
+        if(mainPageController == null) mainPageController = new MainPageController(getApplicationContext());
+        ArrayList<JournalEntryData> entryData = mainPageController.getEntries(AppData.getInstance().getDateSelected());
+
+        for(int i=0; i<entryData.size(); i++) {
+
             LayoutInflater inflater = (LayoutInflater) getApplicationContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
             View entryView = inflater.inflate(R.layout.entry_item, null);//(R.layout.entry_item, );
+
             LinearLayout.LayoutParams buttonLayoutParams = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
             buttonLayoutParams.setMargins(0,10,0,10);
             entryView.setLayoutParams(buttonLayoutParams);
+
             final GestureDetector gestureDetector = new GestureDetector(getApplicationContext(), new MyGestureDetector(entryView));
             entryView.setOnTouchListener(new View.OnTouchListener() {
                 public boolean onTouch(View v, MotionEvent event) {
-//                    Toast.makeText(MainActivity.this, "gesture detected ", Toast.LENGTH_SHORT).show();
                     return gestureDetector.onTouchEvent(event);
                 }
             });
+
+            TextView txtView = (TextView) entryView.findViewById(R.id.timeView);
+            txtView.setText(entryData.get(i).getTime());
+            txtView = (TextView) entryView.findViewById(R.id.descView);
+            txtView.setText(entryData.get(i).getDescription());
+
             mainView.addView(entryView);
+            entryViewsArr.add(entryView);
         }
 
-        registerBroadCastReceivers();
+        String textForHeader = "Entries for " + DateUtils.getEntriesHeaderDateFromDateFormat(AppData.getInstance().getDateSelected());
+        if(entryViewsArr.size() <= 0 ) textForHeader += " : No entries found";
+        TextView entriesHeader = (TextView) findViewById(R.id.entriesHeaderTextView);
+        entriesHeader.setText(textForHeader);
+
+        if(!DateUtils.getCurrentDate().equalsIgnoreCase(AppData.getInstance().getDateSelected())){
+            setStepsCountTextView(mainPageController.getStepCounts(AppData.getInstance().getDateSelected()));
+        }
+
+    }
+
+    private void onDateChangedByUsed(int year, int month, int dayOfMonth) {
+        month++; //month from calendar view is 0 indexed
+        String d = DateUtils.getDateFromCalendarViewDate(dayOfMonth, month, year);
+//        if( d.equalsIgnoreCase(AppData.getInstance().getDateSelected())) return;
+        AppData.getInstance().setDateSelected(d);
+        Log.v(TAG, "dateeeeeeeeeee" +d);
+        updateDateViews();
+        addEntriesToView();
     }
 
     @Override
@@ -132,10 +195,14 @@ public class MainActivity extends AppCompatActivity {
 
     private void setStepCount(long stepCount){
         if(DateUtils.getCurrentDate().equalsIgnoreCase(AppData.getInstance().getDateSelected())){
-            TextView stepsTxtView = (TextView) findViewById(R.id.steps_count);
-            if(stepsTxtView != null){
-                stepsTxtView.setText(stepCount + "");
-            }
+            setStepsCountTextView(stepCount);
+        }
+    }
+
+    private void setStepsCountTextView(long stepCount) {
+        TextView stepsTxtView = (TextView) findViewById(R.id.steps_count);
+        if(stepsTxtView != null){
+            stepsTxtView.setText(stepCount + "");
         }
     }
 

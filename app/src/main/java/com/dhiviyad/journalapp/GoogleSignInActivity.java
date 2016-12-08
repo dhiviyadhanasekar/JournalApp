@@ -32,6 +32,7 @@ public class GoogleSignInActivity extends AppCompatActivity  implements
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        setTitle("Travel Journal");
         setContentView(R.layout.activity_google_sign_in);
 
         findViewById(R.id.sign_in_button).setOnClickListener(this);

@@ -9,8 +9,11 @@ import android.support.annotation.NonNull;
 import android.util.Log;
 
 import com.dhiviyad.journalapp.models.JournalEntryData;
+import com.dhiviyad.journalapp.models.SelectedDateEntriesData;
 import com.dhiviyad.journalapp.models.StepsCountData;
 import com.dhiviyad.journalapp.utils.DateUtils;
+
+import java.util.ArrayList;
 
 /**
  * Created by dhiviyad on 12/3/16.
@@ -48,6 +51,17 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     public StepsCountData createFetchStepsCount(){
         String todaysDate = DateUtils.getCurrentDate();
+        StepsCountData u = getStepsCountData(todaysDate);
+        if(u.getId() == null) {
+            long newRowId = insertStepsCountRow(u);
+            u.setId(newRowId);
+            Log.i("User table created => ", "stepsCountid is" + newRowId );
+        }
+        return u;
+    }
+
+    @NonNull
+    public StepsCountData getStepsCountData(String todaysDate) {
         SQLiteDatabase db = this.getReadableDatabase();
         Cursor cursor = db.rawQuery(StepsCountTable.SQL_SELECT + " WHERE "
                 + StepsCountTable.StepsCountColumns.COLUMN_DATE + "='" + todaysDate + "'" , null);
@@ -56,10 +70,6 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             u.setId( cursor.getLong( cursor.getColumnIndex( StepsCountTable.StepsCountColumns.COLUMN_ID )));
             u.setDate( cursor.getString(cursor.getColumnIndex( StepsCountTable.StepsCountColumns.COLUMN_DATE ))) ;
             u.setStepsCount( cursor.getLong( cursor.getColumnIndex(StepsCountTable.StepsCountColumns.COLUMN_COUNT )));
-        } else {
-            long newRowId = insertStepsCountRow(u);
-            u.setId(newRowId);
-            Log.i("User table created => ", "stepsCountid is" + newRowId );
         }
         cursor.close();
         return u;
@@ -139,4 +149,34 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         if(u.getDescription() != null )values.put(JournalEntriesTable.JournalEntryColumns.COLUMN_DESCRIPTION, u.getDescription());
         return values;
     }
+
+    public ArrayList<JournalEntryData> fetchEntriesForDate(String date) {
+
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor cursor = db.rawQuery(JournalEntriesTable.SQL_SELECT_BY_DATE(date), null);
+        ArrayList<JournalEntryData> entriesArr = new ArrayList<>();
+        if (cursor.moveToFirst()) {
+            while (!cursor.isAfterLast()) {
+                JournalEntryData entry = new JournalEntryData();
+                entry.setDescription(cursor.getString( cursor.getColumnIndex(JournalEntriesTable.JournalEntryColumns.COLUMN_DESCRIPTION) ));
+                entry.setWeather(cursor.getString( cursor.getColumnIndex(JournalEntriesTable.JournalEntryColumns.COLUMN_WEATHER ) ));
+                entry.setCountryName( cursor.getString( cursor.getColumnIndex(JournalEntriesTable.JournalEntryColumns.COLUMN_COUNTRY_NAME)));
+                entry.setStateName( cursor.getString(cursor.getColumnIndex(JournalEntriesTable.JournalEntryColumns.COLUMN_STATE_NAME)));
+                entry.setCityName( cursor.getString( cursor.getColumnIndex(JournalEntriesTable.JournalEntryColumns.COLUMN_CITY_NAME)));
+                entry.setDate( cursor.getString(cursor.getColumnIndex(JournalEntriesTable.JournalEntryColumns.COLUMN_DATE)) );
+                entry.setId( cursor.getLong(cursor.getColumnIndex(JournalEntriesTable.JournalEntryColumns.COLUMN_ID)));
+                entry.setLatitude( cursor.getDouble( cursor.getColumnIndex(JournalEntriesTable.JournalEntryColumns.COLUMN_LATITUDE)));
+                entry.setLongitude( cursor.getDouble( cursor.getColumnIndex(JournalEntriesTable.JournalEntryColumns.COLUMN_LONGITUDE )));
+                entry.setPicture( cursor.getString( cursor.getColumnIndex(JournalEntriesTable.JournalEntryColumns.COLUMN_PICTURE)));
+                entry.setTime( cursor.getString( cursor.getColumnIndex(JournalEntriesTable.JournalEntryColumns.COLUMN_TIME)));
+                entry.setTimestamp( cursor.getLong( cursor.getColumnIndex(JournalEntriesTable.JournalEntryColumns.COLUMN_TIMESTAMP)));
+                Log.v("DB","Entryyyy::::" + entry.getId() );
+                entriesArr.add(entry);
+                cursor.moveToNext();
+            }
+        }
+        cursor.close();
+        return entriesArr;
+    }
+
 }
