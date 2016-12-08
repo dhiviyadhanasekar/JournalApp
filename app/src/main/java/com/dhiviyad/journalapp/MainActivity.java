@@ -99,6 +99,7 @@ public class MainActivity extends AppCompatActivity {
             }
         });
         calendarView.setDate(DateUtils.getCalendarDateFromDateFormat(AppData.getInstance().getDateSelected()), true, true);
+        calendarView.setMaxDate(DateUtils.getCalendarDateFromDateFormat(DateUtils.getCurrentDate()));
     }
 
     private void addEntriesToView() {
