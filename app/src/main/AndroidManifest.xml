@@ -22,9 +22,7 @@
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
-    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.READ_PHONE_STATE" />
-    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
 
     <application
         android:allowBackup="true"
@@ -75,7 +73,9 @@
             android:name=".EntryService"
             android:enabled="true"
             android:exported="true"
-            android:process=":entry_process"></service>
+            android:process=":entry_process" />
+
+        <activity android:name=".SettingsActivity"></activity>
     </application>
 
 </manifest>

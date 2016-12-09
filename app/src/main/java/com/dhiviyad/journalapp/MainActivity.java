@@ -6,7 +6,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.ServiceConnection;
-import android.net.Uri;
 import android.os.IBinder;
 
 import android.os.RemoteException;
@@ -31,13 +30,10 @@ import android.view.MenuItem;
 import com.dhiviyad.journalapp.constants.AppConstants;
 import com.dhiviyad.journalapp.constants.AppData;
 import com.dhiviyad.journalapp.constants.IntentFilterNames;
+import com.dhiviyad.journalapp.controllers.FileOperationsController;
 import com.dhiviyad.journalapp.controllers.MainPageController;
 import com.dhiviyad.journalapp.models.JournalEntryData;
 import com.dhiviyad.journalapp.utils.DateUtils;
-import com.google.android.gms.appindexing.Action;
-import com.google.android.gms.appindexing.AppIndex;
-import com.google.android.gms.appindexing.Thing;
-import com.google.android.gms.common.api.GoogleApiClient;
 
 import java.util.ArrayList;
 
@@ -52,11 +48,13 @@ public class MainActivity extends AppCompatActivity {
     boolean entryServiceConnected;
     ArrayList<View> entryViewsArr;
     MainPageController mainPageController;
+    FileOperationsController fileOperationsController;
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        setCustomTitle();
         setContentView(R.layout.activity_main);
 
         entryServiceConnected = false;
@@ -88,6 +86,15 @@ public class MainActivity extends AppCompatActivity {
         updateDateViews();
         addEntriesToView();
         registerBroadCastReceivers();
+    }
+
+    private void setCustomTitle() {
+        if(fileOperationsController == null) fileOperationsController = new FileOperationsController(getApplicationContext());
+        String title = fileOperationsController.readSettingsFromFile().trim();
+        if(title.length() > 0) { title += "'s "; }
+        title += "Travel Journal";
+//        Toast.makeText(getApplicationContext(),"title = " + title, Toast.LENGTH_LONG).show();
+        setTitle(title);
     }
 
     private void updateDateViews() {
@@ -232,6 +239,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
+        setCustomTitle();
         addEntriesToView();
     }
 
@@ -257,6 +265,8 @@ public class MainActivity extends AppCompatActivity {
 
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_settings) {
+//            Toast.makeText(getApplicationContext(),"Hello Settinga", Toast.LENGTH_SHORT).show();
+            startActivity(new Intent(MainActivity.this, SettingsActivity.class));
             return true;
         }
 
@@ -336,7 +346,7 @@ public class MainActivity extends AppCompatActivity {
         public void onServiceConnected(ComponentName name, IBinder service) {
             remoteService = IJournalAidlInterface.Stub.asInterface((IBinder) service);
             Log.v(TAG, "remote service connected");
-            Toast.makeText(MainActivity.this, "remote service connected", Toast.LENGTH_LONG).show();
+//            Toast.makeText(MainActivity.this, "remote service connected", Toast.LENGTH_LONG).show();
             if (DateUtils.getCurrentDate().equalsIgnoreCase(AppData.getInstance().getDateSelected())) {
                 try {
                     remoteService.sendStepsCount();
@@ -349,7 +359,7 @@ public class MainActivity extends AppCompatActivity {
         @Override
         public void onServiceDisconnected(ComponentName componentName) {
             remoteService = null;
-            Toast.makeText(MainActivity.this, "remote service disconnected", Toast.LENGTH_LONG).show();
+//            Toast.makeText(MainActivity.this, "remote service disconnected", Toast.LENGTH_LONG).show();
             Log.v(TAG, "remote service disconnected");
         }
     }
@@ -372,14 +382,14 @@ public class MainActivity extends AppCompatActivity {
         public void onServiceConnected(ComponentName name, IBinder service) {
             entryRemoteService = IEntryAidlInterface.Stub.asInterface((IBinder) service);
             Log.v(TAG, "remote service connected");
-            Toast.makeText(MainActivity.this, "entry remote service connected", Toast.LENGTH_LONG).show();
+//            Toast.makeText(MainActivity.this, "entry remote service connected", Toast.LENGTH_LONG).show();
             entryServiceConnected = true;
         }
 
         @Override
         public void onServiceDisconnected(ComponentName componentName) {
             entryRemoteService = null;
-            Toast.makeText(MainActivity.this, "entry remote service disconnected", Toast.LENGTH_LONG).show();
+//            Toast.makeText(MainActivity.this, "entry remote service disconnected", Toast.LENGTH_LONG).show();
             Log.v(TAG, "entry remote service disconnected");
         }
     }
