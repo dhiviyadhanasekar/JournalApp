@@ -58,4 +58,7 @@ public final class JournalEntriesTable {
         return SQL_SELECT_ALL + " WHERE " + JournalEntryColumns.COLUMN_DATE + " = '" + date
                 + "' ORDER BY " + JournalEntryColumns.COLUMN_TIMESTAMP;
     }
+    public static final String SQL_SELECT_COUNTRIES = "SELECT DISTINCT " + JournalEntryColumns.COLUMN_COUNTRY_NAME + " FROM "
+                                            + JournalEntryColumns.TABLE_NAME + " WHERE " + JournalEntryColumns.COLUMN_COUNTRY_NAME
+                                            + " IS NOT NULL";
 }

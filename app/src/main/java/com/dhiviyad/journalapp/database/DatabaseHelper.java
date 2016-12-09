@@ -188,4 +188,19 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         return db.delete(table, whereClause, whereArgs);
 
     }
+
+    public ArrayList<String> getCountriesVisited(){
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor cursor = db.rawQuery(JournalEntriesTable.SQL_SELECT_COUNTRIES, null);
+        ArrayList<String> countriesArr = new ArrayList<>();
+        if (cursor.moveToFirst()) {
+            while (!cursor.isAfterLast()) {
+                String country = cursor.getString(cursor.getColumnIndex(JournalEntriesTable.JournalEntryColumns.COLUMN_COUNTRY_NAME));
+                countriesArr.add(country);
+                Log.v("DB", "country name = " + country);
+                cursor.moveToNext();
+            }
+        }
+        return countriesArr;
+    }
 }

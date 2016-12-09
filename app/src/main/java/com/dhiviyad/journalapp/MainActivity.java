@@ -6,9 +6,11 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.ServiceConnection;
+import android.content.pm.PackageManager;
 import android.os.IBinder;
 
 import android.os.RemoteException;
+import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -30,6 +32,7 @@ import android.view.MenuItem;
 import com.dhiviyad.journalapp.constants.AppConstants;
 import com.dhiviyad.journalapp.constants.AppData;
 import com.dhiviyad.journalapp.constants.IntentFilterNames;
+import com.dhiviyad.journalapp.constants.Permissions;
 import com.dhiviyad.journalapp.controllers.FileOperationsController;
 import com.dhiviyad.journalapp.controllers.MainPageController;
 import com.dhiviyad.journalapp.models.JournalEntryData;
@@ -86,6 +89,12 @@ public class MainActivity extends AppCompatActivity {
         updateDateViews();
         addEntriesToView();
         registerBroadCastReceivers();
+
+        if (ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(this,
+                    new String[]{android.Manifest.permission.ACCESS_FINE_LOCATION, android.Manifest.permission.ACCESS_COARSE_LOCATION},
+                    Permissions.LOCATION_SERVICE);
+        }
     }
 
     private void setCustomTitle() {
@@ -267,6 +276,9 @@ public class MainActivity extends AppCompatActivity {
         if (id == R.id.action_settings) {
 //            Toast.makeText(getApplicationContext(),"Hello Settinga", Toast.LENGTH_SHORT).show();
             startActivity(new Intent(MainActivity.this, SettingsActivity.class));
+            return true;
+        } else if(id == R.id.countries_visited) {
+            startActivity( new Intent(MainActivity.this, CountriesActivity.class ));
             return true;
         }
 

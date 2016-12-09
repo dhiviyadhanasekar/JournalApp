@@ -75,7 +75,8 @@
             android:exported="true"
             android:process=":entry_process" />
 
-        <activity android:name=".SettingsActivity"></activity>
+        <activity android:name=".SettingsActivity" />
+        <activity android:name=".CountriesActivity"></activity>
     </application>
 
 </manifest>
