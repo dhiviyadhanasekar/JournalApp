@@ -7,6 +7,8 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.ServiceConnection;
 import android.content.pm.PackageManager;
+import android.media.Image;
+import android.net.Uri;
 import android.os.IBinder;
 
 import android.os.RemoteException;
@@ -20,6 +22,7 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.widget.CalendarView;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -157,6 +160,12 @@ public class MainActivity extends AppCompatActivity {
             });
 
             final JournalEntryData currentEntryData = entryData.get(i);
+
+            if(currentEntryData.getPicture() != null && currentEntryData.getPicture().length() > 0) {
+                ImageView entryImage = (ImageView) entryView.findViewById(R.id.image_preview);
+                entryImage.setImageURI(Uri.parse(currentEntryData.getPicture()));
+            }
+
             addDeleteButtonClick(entryView, currentEntryData);
             addEditButtonClick(entryView, currentEntryData);
             setEntryTextFields(entryView, currentEntryData);
@@ -181,7 +190,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
 //                    Log.v(TAG, "Clicked delete button for id :: " + currentEntryData.getId());
-                Toast.makeText(getApplicationContext(), "onClick", Toast.LENGTH_SHORT).show();
+//                Toast.makeText(getApplicationContext(), "onClick", Toast.LENGTH_SHORT).show();
                 if (entryServiceConnected == false) {
                     Toast.makeText(getApplicationContext(), "Waiting for services to come up", Toast.LENGTH_LONG);
                 }

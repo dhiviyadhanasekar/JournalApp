@@ -60,4 +60,8 @@ public class JournalEntryController {
     public void saveDescription(String text) {
         journalEntry.setDescription(text);
     }
+
+    public void savePicture(String picture) {
+        journalEntry.setPicture(picture);
+    }
 }

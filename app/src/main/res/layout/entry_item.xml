@@ -36,7 +36,10 @@
         app:srcCompat="@drawable/beautiful"
         android:layout_width="60dp"
         android:layout_height="50dp"
-        android:src="@drawable/beautiful" />
+        android:src="@drawable/beautiful"
+        android:id="@+id/image_preview"
+        android:scaleType="fitXY"
+        />
 
     <LinearLayout
         android:orientation="vertical"

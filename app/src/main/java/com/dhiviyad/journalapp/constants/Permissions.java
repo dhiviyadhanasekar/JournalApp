@@ -6,6 +6,6 @@ package com.dhiviyad.journalapp.constants;
 
 public class Permissions {
     public static final int LOCATION_SERVICE = 0;
-    public static final int READ_IMAGE = 1;
+    public static final int PERMISSION_READ_MEDIA = 2;
 }
 

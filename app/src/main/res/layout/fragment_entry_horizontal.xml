@@ -24,11 +24,12 @@
             android:layout_width="250dp">
 
             <ImageView
-                app:srcCompat="@drawable/beautiful"
                 android:id="@+id/imageView"
                 android:paddingRight="0dp"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent" />
+                android:layout_height="match_parent"
+                app:srcCompat="@drawable/beautiful"
+                android:scaleType="fitXY"/>
 
             <ImageView
                 app:srcCompat="@android:drawable/ic_menu_edit"

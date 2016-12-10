@@ -5,12 +5,16 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.IntentFilter;
 import android.content.ServiceConnection;
+import android.database.Cursor;
+import android.graphics.drawable.Drawable;
 import android.location.Address;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.res.Configuration;
 import android.location.Geocoder;
 import android.location.Location;
+import android.net.Uri;
+import android.os.Environment;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.Message;
@@ -21,13 +25,18 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
+import android.support.v4.content.ContextCompat;
+import android.support.v4.content.res.ResourcesCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.EditText;
+import android.widget.FrameLayout;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -41,10 +50,20 @@ import com.dhiviyad.journalapp.utils.DateUtils;
 import com.dhiviyad.journalapp.webservice.RemoteFetch;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GoogleApiAvailability;
+
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.nio.channels.FileChannel;
 import java.util.ArrayList;
 
 import layout.EntryHorizontalFragment;
 import layout.EntryVerticalFragment;
+
+import static com.dhiviyad.journalapp.constants.Permissions.PERMISSION_READ_MEDIA;
 
 public class EntryActivity extends AppCompatActivity {
 
@@ -122,9 +141,9 @@ public class EntryActivity extends AppCompatActivity {
         Log.v("onRequestPermisst", permissions.toString());
         switch (requestCode) {
 
-            case Permissions.LOCATION_SERVICE:
+            case PERMISSION_READ_MEDIA:
                 if ((grantResults.length > 0) && (grantResults[0] == PackageManager.PERMISSION_GRANTED)) {
-//                    getLastKnownLocation();
+                    loadImage();
                 }
                 break;
 
@@ -139,24 +158,76 @@ public class EntryActivity extends AppCompatActivity {
         startActivityForResult(galleryIntent, imageID);
     }
 
+    private static Uri imageUri;
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         Log.v("onActivityResult", requestCode + " => " + data);
         if(requestCode == imageID && resultCode == RESULT_OK && data != null){
-            //todo:
 //            recipie.setImageUri(data.getData());
-//            int permissionCheck = ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE);
-//            Log.v("addRecipieImage", permissionCheck + "");
-//            if (permissionCheck != PackageManager.PERMISSION_GRANTED) {
-//                ActivityCompat.requestPermissions(
-//                        this, new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, PERMISSION_READ_MEDIA);
-//            } else {
-//                Log.v("loadImage", "from addRecipieImage");
-//                loadImage();
-//            }
+            imageUri = data.getData();
+            int permissionCheck = ContextCompat.checkSelfPermission(this, android.Manifest.permission.READ_EXTERNAL_STORAGE);
+            Log.v("add entry image", permissionCheck + "");
+            if (permissionCheck != PackageManager.PERMISSION_GRANTED) {
+                ActivityCompat.requestPermissions(
+                        this, new String[]{android.Manifest.permission.READ_EXTERNAL_STORAGE}, PERMISSION_READ_MEDIA);
+            } else {
+                Log.v("loadImage", "from Entryactivity");
+                loadImage();
+            }
         }
     }
+
+    private void loadImage() {
+        Log.v("loadImage", "yayy");
+        createAppDirectory();
+        try {
+            remoteService.setPicture(imageUri.toString());
+        } catch (RemoteException e) {
+            e.printStackTrace();
+        }
+//        ImageView imageView = (ImageView) findViewById(R.id.imageView);
+//        imageView.setImageURI(imageUri);
+
+    }
+
+    private boolean createAppDirectory(){
+        File folder = new File(Environment.getExternalStorageDirectory() + "/JournalApp");
+        boolean success = true;
+        if (!folder.exists()) {
+            success = folder.mkdir();
+        }
+        return success;
+    }
+
+
+//    void savefile(URI sourceuri)
+//    {
+//        String sourceFilename= sourceuri.getPath();
+//        String destinationFilename = android.os.Environment.getExternalStorageDirectory().getPath()+File.separatorChar+"abc.mp3";
+//
+//        BufferedInputStream bis = null;
+//        BufferedOutputStream bos = null;
+//
+//        try {
+//            bis = new BufferedInputStream(new FileInputStream(sourceFilename));
+//            bos = new BufferedOutputStream(new FileOutputStream(destinationFilename, false));
+//            byte[] buf = new byte[1024];
+//            bis.read(buf);
+//            do {
+//                bos.write(buf);
+//            } while(bis.read(buf) != -1);
+//        } catch (IOException e) {
+//
+//        } finally {
+//            try {
+//                if (bis != null) bis.close();
+//                if (bos != null) bos.close();
+//            } catch (IOException e) {
+//
+//            }
+//        }
+//    }
 
     private boolean isGooglePlayServicesAvailable() {
         GoogleApiAvailability googleAPI = GoogleApiAvailability.getInstance();
@@ -188,6 +259,12 @@ public class EntryActivity extends AppCompatActivity {
 
         EditText descEditText = (EditText) findViewById(R.id.descEditText);
         descEditText.setText(entry.getDescription());
+
+        if(entry.getPicture() != null && entry.getPicture().length() > 0){
+            imageUri = Uri.parse(entry.getPicture());
+            ImageView imageView = (ImageView) findViewById(R.id.imageView);
+            imageView.setImageURI(imageUri);
+        }
     }
 
     public void saveEntry(View v){

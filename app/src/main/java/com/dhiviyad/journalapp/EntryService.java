@@ -101,6 +101,11 @@ public class EntryService extends Service implements GoogleApiClient.ConnectionC
                         , countryName, stateName,  cityName,  weather,  picture,  time,  date,  description, timestamp);
                 journalEntryController.createExistingEntry(j);
             };
+            @Override
+            public void setPicture(String picture){
+                journalEntryController.savePicture(picture);
+                sendEntryDataBroadcast();
+            }
         };
     }
 
