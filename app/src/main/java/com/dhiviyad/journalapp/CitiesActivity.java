@@ -15,13 +15,12 @@ import com.dhiviyad.journalapp.controllers.LocationListController;
 
 import java.util.ArrayList;
 
-public class StatesActivity extends AppCompatActivity {
+public class CitiesActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_states);
-
+        setContentView(R.layout.activity_cities);
 
         LocationListController locationListController = new LocationListController(getApplicationContext());
         ArrayList<String> countries;
@@ -30,9 +29,9 @@ public class StatesActivity extends AppCompatActivity {
         if(intent.hasExtra(IntentFilterNames.COUNTRY_NAME_DATA)){
             cName = intent.getStringExtra(IntentFilterNames.COUNTRY_NAME_DATA);
         }
-        countries = locationListController.getStatesVisited(cName);
+        countries = locationListController.getCitiesVisited(cName);
 
-        setTitle("States visited (" + countries.size() +")");
+        setTitle("Cities visited (" + countries.size() +")");
 
 //        Toast.makeText(getApplicationContext(), "Countries => " + countries.get(0), Toast.LENGTH_LONG).show();
         LinearLayout mainView = (LinearLayout) findViewById(R.id.countriesView);
@@ -47,18 +46,6 @@ public class StatesActivity extends AppCompatActivity {
 
             TextView countryTextView = (TextView) countryView.findViewById(R.id.countryName);
             countryTextView.setText(countryName);
-
-            countryView.setOnTouchListener(new View.OnTouchListener() {
-                public boolean onTouch(View v, MotionEvent event) {
-                    if (event.getAction() == MotionEvent.ACTION_DOWN) {
-//                    Toast.makeText(MainActivity.this, "Touch detetced", Toast.LENGTH_SHORT).show();
-                        Intent stateIntent = new Intent(StatesActivity.this, CitiesActivity.class);
-                        stateIntent.putExtra(IntentFilterNames.COUNTRY_NAME_DATA, countryName);
-                        startActivity(stateIntent);
-                    }
-                    return true;
-                }
-            });
 
             mainView.addView(countryView);
         }

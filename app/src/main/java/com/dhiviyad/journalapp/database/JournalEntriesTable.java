@@ -65,5 +65,9 @@ public final class JournalEntriesTable {
     public static final String SQL_SELECT_STATES = "SELECT DISTINCT " + JournalEntryColumns.COLUMN_STATE_NAME + " FROM "
             + JournalEntryColumns.TABLE_NAME + " WHERE " + JournalEntryColumns.COLUMN_STATE_NAME
             + " IS NOT NULL";
+
+    public static final String SQL_SELECT_CITIES = "SELECT DISTINCT " + JournalEntryColumns.COLUMN_CITY_NAME + " FROM "
+            + JournalEntryColumns.TABLE_NAME + " WHERE " + JournalEntryColumns.COLUMN_CITY_NAME
+            + " IS NOT NULL";
 }
 

@@ -38,4 +38,8 @@ public class LocationListController {
     public ArrayList<String> getStatesVisited(String countryName){
         return db.getStatesVisited(countryName);
     }
+
+    public ArrayList<String> getCitiesVisited(String cName) {
+        return db.getCitiesVisited(cName);
+    }
 }

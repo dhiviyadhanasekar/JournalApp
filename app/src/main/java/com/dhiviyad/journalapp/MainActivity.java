@@ -7,6 +7,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.ServiceConnection;
 import android.content.pm.PackageManager;
+import android.graphics.drawable.BitmapDrawable;
 import android.media.Image;
 import android.net.Uri;
 import android.os.IBinder;
@@ -161,10 +162,7 @@ public class MainActivity extends AppCompatActivity {
 
             final JournalEntryData currentEntryData = entryData.get(i);
 
-            if(currentEntryData.getPicture() != null && currentEntryData.getPicture().length() > 0) {
-                ImageView entryImage = (ImageView) entryView.findViewById(R.id.image_preview);
-                entryImage.setImageURI(Uri.parse(currentEntryData.getPicture()));
-            }
+//            setImageForEntry(entryView, currentEntryData);
 
             addDeleteButtonClick(entryView, currentEntryData);
             addEditButtonClick(entryView, currentEntryData);
@@ -183,6 +181,16 @@ public class MainActivity extends AppCompatActivity {
         }
 
     }
+
+//    private void setImageForEntry(View entryView, JournalEntryData currentEntryData) {
+//        if(currentEntryData.getPicture() != null && currentEntryData.getPicture().length() > 0) {
+//            ImageView entryImage = (ImageView) entryView.findViewById(R.id.image_preview);
+//                ((BitmapDrawable)entryImage.getDrawable()).getBitmap().recycle();
+//            entryImage.setImageURI(Uri.parse(currentEntryData.getPicture()));
+//            entryImage.getLayoutParams().height = (int) getResources().getDimension(R.dimen.previewImageView_height);
+//            entryImage.getLayoutParams().width = (int) getResources().getDimension(R.dimen.previewImageView_width);
+//        }
+//    }
 
     private void addEditButtonClick(View entryView, final JournalEntryData currentEntryData) {
         ImageButton editButton = (ImageButton) entryView.findViewById(R.id.pencilBtn);
@@ -259,6 +267,18 @@ public class MainActivity extends AppCompatActivity {
         super.onResume();
         setCustomTitle();
         addEntriesToView();
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        LinearLayout mainView = (LinearLayout) findViewById(R.id.entriesView);
+        if (entryViewsArr != null && entryViewsArr.size() > 0) {
+            for (int i = 0; i < entryViewsArr.size(); i++) {
+                mainView.removeView(entryViewsArr.get(i));
+
+            }
+        }
     }
 
     @Override

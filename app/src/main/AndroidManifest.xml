@@ -77,7 +77,8 @@
 
         <activity android:name=".SettingsActivity" />
         <activity android:name=".CountriesActivity" />
-        <activity android:name=".StatesActivity"></activity>
+        <activity android:name=".StatesActivity" />
+        <activity android:name=".CitiesActivity"></activity>
     </application>
 
 </manifest>

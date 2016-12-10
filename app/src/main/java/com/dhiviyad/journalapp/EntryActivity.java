@@ -6,6 +6,10 @@ import android.content.Context;
 import android.content.IntentFilter;
 import android.content.ServiceConnection;
 import android.database.Cursor;
+import android.graphics.Bitmap;
+import android.graphics.BitmapRegionDecoder;
+import android.graphics.Rect;
+import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.location.Address;
 import android.content.Intent;
@@ -63,6 +67,7 @@ import java.util.ArrayList;
 import layout.EntryHorizontalFragment;
 import layout.EntryVerticalFragment;
 
+import static android.R.attr.width;
 import static com.dhiviyad.journalapp.constants.Permissions.PERMISSION_READ_MEDIA;
 
 public class EntryActivity extends AppCompatActivity {
@@ -261,9 +266,31 @@ public class EntryActivity extends AppCompatActivity {
         descEditText.setText(entry.getDescription());
 
         if(entry.getPicture() != null && entry.getPicture().length() > 0){
-            imageUri = Uri.parse(entry.getPicture());
+
             ImageView imageView = (ImageView) findViewById(R.id.imageView);
-            imageView.setImageURI(imageUri);
+            imageUri = Uri.parse(entry.getPicture());
+//            imageView.getLayoutParams().height = (int) getResources().getDimension(R.dimen.recipieImageView_height);
+//            imageView.getLayoutParams().width = (int) getResources().getDimension(R.dimen.recipieImageView_width);
+//            try {
+//                Bitmap bm = MediaStore.Images.Media.getBitmap(this.getContentResolver(), imageUri);
+//                Bitmap bitmapsimplesize = Bitmap.createScaledBitmap(bm, (int) getResources().getDimension(R.dimen.recipieImageView_width)
+//                        , (int) getResources().getDimension(R.dimen.recipieImageView_height), true);
+//                bm.recycle();
+//                imageView.setImageBitmap(bitmapsimplesize);
+                imageView.setImageURI(imageUri);
+//            }catch (Exception e){
+//                e.printStackTrace();
+//            }
+
+//            Bitmap bitmapsimplesize = Bitmap.createScaledBitmap(bm, width, height, true);
+//            bm.recycle();
+
+//            BitmapRegionDecoder decoder = BitmapRegionDecoder.newInstance(myStream, false);
+//            Bitmap region = decoder.decodeRegion(new Rect(10, 10, 50, 50), null);
+
+//            ImageView imageView = (ImageView) findViewById(R.id.imageView);
+////            ((BitmapDrawable)imageView.getDrawable()).getBitmap().recycle();
+//            imageView.setImageURI(imageUri);
         }
     }
 

@@ -4,6 +4,9 @@ import android.content.Context;
 import android.support.test.InstrumentationRegistry;
 import android.support.test.runner.AndroidJUnit4;
 
+import com.dhiviyad.journalapp.database.DatabaseHelper;
+import com.dhiviyad.journalapp.models.JournalEntryData;
+
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
@@ -23,4 +26,20 @@ public class ExampleInstrumentedTest {
 
         assertEquals("com.dhiviyad.journalapp", appContext.getPackageName());
     }
+
+    @Test
+    public void savingJournalEntryTest() throws Exception {
+        // Context of the app under test.
+        Context appContext = InstrumentationRegistry.getTargetContext();
+        DatabaseHelper db = new DatabaseHelper(appContext);
+        JournalEntryData j = new JournalEntryData();
+        j.setCountryName("India");
+        j.setStateName("Tamil Nadu");
+        j.setCityName("Chennai");
+        j.setDescription("Went to one of my favorite places on earth - Marina Beach");
+        Long id = db.insertEntry(j);
+        assertTrue(id != null);
+//        assertEquals("com.dhiviyad.journalapp", appContext.getPackageName());
+    }
+
 }
