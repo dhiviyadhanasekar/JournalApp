@@ -76,7 +76,8 @@
             android:process=":entry_process" />
 
         <activity android:name=".SettingsActivity" />
-        <activity android:name=".CountriesActivity"></activity>
+        <activity android:name=".CountriesActivity" />
+        <activity android:name=".StatesActivity"></activity>
     </application>
 
 </manifest>

@@ -12,4 +12,6 @@ public class IntentFilterNames {
     public static final String ENTRY_DATA_RECEIVED = AppConstants.PACKAGE_NAME + ".ENTRY_DATA_RECEIVED";
     public static final String ENTRY_DATA = "ENTRY_DATA";
 
+    public static final String COUNTRY_NAME_DATA = "COUNTRY_DATA";
+
 }

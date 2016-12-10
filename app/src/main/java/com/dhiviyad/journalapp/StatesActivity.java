@@ -9,25 +9,30 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.dhiviyad.journalapp.constants.IntentFilterNames;
 import com.dhiviyad.journalapp.controllers.LocationListController;
 
 import java.util.ArrayList;
 
-public class CountriesActivity extends AppCompatActivity {
+public class StatesActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_states);
 
-        setContentView(R.layout.activity_countries);
 
         LocationListController locationListController = new LocationListController(getApplicationContext());
-        ArrayList<String> countries = locationListController.getCountriesVisited();
-//        countries.add("India");
-        setTitle("Countries visited (" + countries.size() +")");
+        ArrayList<String> countries;
+        Intent intent = getIntent();
+        String cName = null;
+        if(intent.hasExtra(IntentFilterNames.COUNTRY_NAME_DATA)){
+            cName = intent.getStringExtra(IntentFilterNames.COUNTRY_NAME_DATA);
+        }
+        countries = locationListController.getStatesVisited(cName);
+
+        setTitle("States visited (" + countries.size() +")");
 
 //        Toast.makeText(getApplicationContext(), "Countries => " + countries.get(0), Toast.LENGTH_LONG).show();
         LinearLayout mainView = (LinearLayout) findViewById(R.id.countriesView);
@@ -45,13 +50,10 @@ public class CountriesActivity extends AppCompatActivity {
 
             countryView.setOnTouchListener(new View.OnTouchListener() {
                 public boolean onTouch(View v, MotionEvent event) {
-
 //                    Toast.makeText(MainActivity.this, "Touch detetced", Toast.LENGTH_SHORT).show();
-                    if (event.getAction() == MotionEvent.ACTION_DOWN) {
-                        Intent stateIntent = new Intent(CountriesActivity.this, StatesActivity.class);
-                        stateIntent.putExtra(IntentFilterNames.COUNTRY_NAME_DATA, countryName);
-                        startActivity(stateIntent);
-                    }
+//                    Intent stateIntent = new Intent(CountriesActivity.this, StatesActivity.class);
+//                    stateIntent.putExtra("countryName", countryName);
+//                    startActivity(stateIntent);
                     return true;
                 }
             });

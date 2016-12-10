@@ -203,4 +203,26 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         }
         return countriesArr;
     }
+
+    public ArrayList<String> getStatesVisited(String countryName){
+
+        SQLiteDatabase db = this.getReadableDatabase();
+        String query = JournalEntriesTable.SQL_SELECT_STATES;
+        if(countryName != null && countryName.length() > 0){
+            query += " AND " + JournalEntriesTable.JournalEntryColumns.COLUMN_COUNTRY_NAME
+                    + "='" + countryName + "'";
+        }
+        Cursor cursor = db.rawQuery( query, null);
+        ArrayList<String> countriesArr = new ArrayList<>();
+        if (cursor.moveToFirst()) {
+            while (!cursor.isAfterLast()) {
+                String country = cursor.getString(cursor.getColumnIndex(JournalEntriesTable.JournalEntryColumns.COLUMN_STATE_NAME));
+                countriesArr.add(country);
+                Log.v("DB", "state name = " + country);
+                cursor.moveToNext();
+            }
+        }
+        return countriesArr;
+
+    }
 }

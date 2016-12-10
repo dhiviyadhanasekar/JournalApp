@@ -35,7 +35,7 @@ public class LocationListController {
         }
     }
 
-//    public ArrayList<String> getStatesVisited(String countryName){
-//        return db.
-//    }
+    public ArrayList<String> getStatesVisited(String countryName){
+        return db.getStatesVisited(countryName);
+    }
 }
