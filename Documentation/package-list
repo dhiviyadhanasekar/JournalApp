@@ -1,0 +1,8 @@
+com.dhiviyad.journalapp
+com.dhiviyad.journalapp.constants
+com.dhiviyad.journalapp.controllers
+com.dhiviyad.journalapp.database
+com.dhiviyad.journalapp.models
+com.dhiviyad.journalapp.utils
+com.dhiviyad.journalapp.webservice
+layout
