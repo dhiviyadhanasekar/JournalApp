@@ -19,6 +19,7 @@ import static org.junit.Assert.*;
  */
 @RunWith(AndroidJUnit4.class)
 public class ExampleInstrumentedTest {
+
     @Test
     public void useAppContext() throws Exception {
         // Context of the app under test.
@@ -27,6 +28,8 @@ public class ExampleInstrumentedTest {
         assertEquals("com.dhiviyad.journalapp", appContext.getPackageName());
     }
 
+    //functional test case for the main database action
+    //as long as this works, the app should work fine
     @Test
     public void savingJournalEntryTest() throws Exception {
         // Context of the app under test.
@@ -39,7 +42,6 @@ public class ExampleInstrumentedTest {
         j.setDescription("Went to one of my favorite places on earth - Marina Beach");
         Long id = db.insertEntry(j);
         assertTrue(id != null);
-//        assertEquals("com.dhiviyad.journalapp", appContext.getPackageName());
     }
 
 }
